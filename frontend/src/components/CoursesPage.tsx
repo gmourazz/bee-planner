@@ -2,6 +2,7 @@ import {
   Award,
   Calendar,
   AlertCircle,
+  AlertTriangle,
   CheckCircle,
   PlusCircle,
   TrendingUp,
@@ -41,12 +42,12 @@ export function CoursesPage() {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
           {[
-            { icon: <CheckCircle className="w-4 h-4 text-[#10B981]" />, label: "Concluídos", value: completed },
+            { icon: <CheckCircle className="w-4 h-4" style={{ color: currentTheme.colors.primary }} />, label: "Concluídos", value: completed },
             { icon: <TrendingUp className="w-4 h-4" style={{ color: currentTheme.colors.primary }} />, label: "Em Progresso", value: inProgress },
-            { icon: <AlertCircle className="w-4 h-4 text-[#EF4444]" />, label: "Não Finalizados", value: notFinished },
-            { icon: <Calendar className="w-4 h-4 text-[#F59E0B]" />, label: "Urgentes", value: urgent },
-            { icon: <Award className="w-4 h-4" style={{ color: currentTheme.colors.accent }} />, label: "Certificados", value: totalCertificates },
-            { icon: <AlertCircle className="w-4 h-4 text-[#F59E0B]" />, label: "Expirando (30d)", value: expiringCertificates },
+            { icon: <AlertCircle className="w-4 h-4" style={{ color: currentTheme.colors.textMuted }} />, label: "Não Finalizados", value: notFinished },
+            { icon: <Calendar className="w-4 h-4" style={{ color: currentTheme.colors.accent }} />, label: "Urgentes", value: urgent },
+            { icon: <Award className="w-4 h-4" style={{ color: currentTheme.colors.primaryDark }} />, label: "Certificados", value: totalCertificates },
+            { icon: <AlertCircle className="w-4 h-4" style={{ color: currentTheme.colors.accent }} />, label: "Expirando (30d)", value: expiringCertificates },
           ].map((stat, i) => (
             <div
               key={i}
@@ -79,10 +80,10 @@ export function CoursesPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {courses.map((course) => {
           const statusConfig = {
-            completed: { label: "Concluído", color: "#10B981", bgColor: "#D1FAE5" },
+            completed: { label: "Concluído", color: currentTheme.colors.primaryDark, bgColor: currentTheme.colors.primaryLight },
             "in-progress": { label: "Em Progresso", color: currentTheme.colors.primary, bgColor: currentTheme.colors.primaryLight },
-            urgent: { label: "Urgente", color: "#F59E0B", bgColor: "#FEF3C7" },
-            "not-finished": { label: "Não Finalizado", color: "#EF4444", bgColor: "#FEE2E2" },
+            urgent: { label: "Urgente", color: currentTheme.colors.accent, bgColor: currentTheme.colors.accent + "20" },
+            "not-finished": { label: "Não Finalizado", color: currentTheme.colors.textMuted, bgColor: currentTheme.colors.primaryLight },
           }[course.status] || { label: "", color: "", bgColor: "" };
 
           return (
@@ -166,8 +167,9 @@ export function CoursesPage() {
                         </p>
                       )}
                       {course.certificateExpiry && (
-                        <p className="text-xs text-[#F59E0B] mt-1">
-                          ⚠️ Expira em: {course.certificateExpiry}
+                        <p className="text-xs mt-1 flex items-center gap-1" style={{ color: currentTheme.colors.accent }}>
+                          <AlertTriangle className="w-3 h-3 flex-shrink-0" />
+                          Expira em: {course.certificateExpiry}
                         </p>
                       )}
                     </div>

@@ -19,26 +19,25 @@ interface CalEvent {
   date: string;
   title: string;
   type: string;
-  color: string;
 }
 
-const TYPE_CONFIG: Record<string, { color: string; Icon: React.FC<{ className?: string; style?: React.CSSProperties }> }> = {
-  Pessoal: { color: '#F472B6', Icon: Heart },
-  Aniversário: { color: '#FCD34D', Icon: Cake },
-  Universitário: { color: '#BE185D', Icon: BookOpen },
-  Hábito: { color: '#10B981', Icon: Zap },
-  Saúde: { color: '#10B981', Icon: Stethoscope },
-  Entrega: { color: '#A855F7', Icon: FileText },
+const TYPE_ICONS: Record<string, React.FC<{ className?: string; style?: React.CSSProperties }>> = {
+  Pessoal: Heart,
+  Aniversário: Cake,
+  Universitário: BookOpen,
+  Hábito: Zap,
+  Saúde: Stethoscope,
+  Entrega: FileText,
 };
 
 let nextEvId = 10;
 
 const initialEvents: CalEvent[] = [
-  { id: nextEvId++, date: '2026-05-05', title: 'Aniversário da mamãe', type: 'Aniversário', color: '#F472B6' },
-  { id: nextEvId++, date: '2026-05-12', title: 'Prova de Cálculo II', type: 'Universitário', color: '#FCD34D' },
-  { id: nextEvId++, date: '2026-05-15', title: 'Consulta médica', type: 'Saúde', color: '#10B981' },
-  { id: nextEvId++, date: '2026-05-20', title: 'Entrega de TCC', type: 'Entrega', color: '#BE185D' },
-  { id: nextEvId++, date: '2026-05-25', title: 'Yoga no parque', type: 'Hábito', color: '#A855F7' },
+  { id: nextEvId++, date: '2026-05-05', title: 'Aniversário da mamãe', type: 'Aniversário' },
+  { id: nextEvId++, date: '2026-05-12', title: 'Prova de Cálculo II', type: 'Universitário' },
+  { id: nextEvId++, date: '2026-05-15', title: 'Consulta médica', type: 'Saúde' },
+  { id: nextEvId++, date: '2026-05-20', title: 'Entrega de TCC', type: 'Entrega' },
+  { id: nextEvId++, date: '2026-05-25', title: 'Yoga no parque', type: 'Hábito' },
 ];
 
 export function CalendarPage() {
@@ -72,10 +71,20 @@ export function CalendarPage() {
     .sort((a, b) => a.date.localeCompare(b.date))
     .slice(0, 6);
 
+  const typeColors = [
+    currentTheme.colors.primary,
+    currentTheme.colors.accent,
+    currentTheme.colors.primaryDark,
+    currentTheme.colors.primary,
+    currentTheme.colors.accent,
+    currentTheme.colors.primaryDark,
+  ];
+  const typeKeys = Object.keys(TYPE_ICONS);
+  const getEventColor = (type: string) => typeColors[typeKeys.indexOf(type) % typeColors.length] || currentTheme.colors.primary;
+
   const addEvent = () => {
     if (!form.title.trim() || !form.date) return;
-    const color = TYPE_CONFIG[form.type]?.color || '#F472B6';
-    setEvents((prev) => [...prev, { id: nextEvId++, date: form.date, title: form.title.trim(), type: form.type, color }]);
+    setEvents((prev) => [...prev, { id: nextEvId++, date: form.date, title: form.title.trim(), type: form.type }]);
     setForm({ title: '', type: 'Pessoal', date: '' });
     setSelectedDay(null);
   };
@@ -136,7 +145,7 @@ export function CalendarPage() {
                         {dayEvents.length > 0 && (
                           <div className="flex justify-center gap-0.5 flex-wrap">
                             {dayEvents.slice(0, 3).map((e) => (
-                              <div key={e.id} className="w-1.5 h-1.5 rounded-full" style={{ background: isToday ? "rgba(255,255,255,0.8)" : e.color }} />
+                              <div key={e.id} className="w-1.5 h-1.5 rounded-full" style={{ background: isToday ? "rgba(255,255,255,0.8)" : getEventColor(e.type) }} />
                             ))}
                           </div>
                         )}
@@ -149,9 +158,9 @@ export function CalendarPage() {
 
             {/* Legend */}
             <div className="flex flex-wrap gap-3 mt-6 pt-4 border-t" style={{ borderColor: currentTheme.colors.primary + "15" }}>
-              {Object.entries(TYPE_CONFIG).map(([label, { color, Icon }]) => (
+              {Object.entries(TYPE_ICONS).map(([label, Icon]) => (
                 <div key={label} className="flex items-center gap-1.5">
-                  <Icon className="w-3 h-3" style={{ color }} />
+                  <Icon className="w-3 h-3" style={{ color: getEventColor(label) }} />
                   <span className="text-[12px]" style={{ color: currentTheme.colors.textMuted }}>{label}</span>
                 </div>
               ))}
@@ -194,7 +203,7 @@ export function CalendarPage() {
                 className="w-full px-4 py-2.5 rounded-xl border-2 border-transparent outline-none transition-all text-sm"
                 style={{ background: currentTheme.colors.primaryLight, color: currentTheme.colors.text }}
               >
-                {Object.keys(TYPE_CONFIG).map((t) => <option key={t} value={t}>{t}</option>)}
+                {Object.keys(TYPE_ICONS).map((t) => <option key={t} value={t}>{t}</option>)}
               </select>
               <button
                 onClick={addEvent}
@@ -217,17 +226,17 @@ export function CalendarPage() {
                 <p className="text-sm text-center py-4" style={{ color: currentTheme.colors.textMuted }}>Nenhum evento próximo</p>
               )}
               {upcomingEvents.map((event) => {
-                const cfg = TYPE_CONFIG[event.type];
-                const Icon = cfg?.Icon || CalendarIcon;
+                const Icon = TYPE_ICONS[event.type] || CalendarIcon;
+                const color = getEventColor(event.type);
                 const d = new Date(event.date + 'T00:00');
                 return (
                   <div
                     key={event.id}
                     className="group flex items-center gap-3 p-3 rounded-xl border-l-4 hover:opacity-80 transition-all"
-                    style={{ borderColor: event.color }}
+                    style={{ borderColor: color }}
                   >
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: event.color + "20" }}>
-                      <Icon className="w-5 h-5" style={{ color: event.color }} />
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: currentTheme.colors.primaryLight }}>
+                      <Icon className="w-5 h-5" style={{ color }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate" style={{ color: currentTheme.colors.text }}>{event.title}</p>
@@ -236,7 +245,7 @@ export function CalendarPage() {
                       </p>
                     </div>
                     <button onClick={() => deleteEvent(event.id)} className="opacity-0 group-hover:opacity-100 transition-all">
-                      <Trash2 className="w-4 h-4 text-red-400" />
+                      <Trash2 className="w-4 h-4" style={{ color: currentTheme.colors.textMuted }} />
                     </button>
                   </div>
                 );

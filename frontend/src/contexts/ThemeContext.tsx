@@ -1,37 +1,22 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
+import type { Theme } from '../types/theme.types';
 
-export interface Theme {
-  id: string;
-  name: string;
-  category: string;
-  colors: {
-    primary: string;
-    primaryLight: string;
-    primaryDark: string;
-    accent: string;
-    background: string;
-    surface: string;
-    text: string;
-    textMuted: string;
-  };
-  emoji: string;
-  backgroundPattern?: string;
-}
+export type { Theme };
 
 export const themes: Theme[] = [
   {
     id: 'bee',
-    name: 'Abelha',
+    name: 'Sistema',
     category: 'Padrão',
     colors: {
-      primary: '#F472B6',
+      primary:      '#F472B6',
       primaryLight: '#FDE8F3',
-      primaryDark: '#BE185D',
-      accent: '#FCD34D',
-      background: '#FFF9FB',
-      surface: '#FFFFFF',
-      text: '#3B1A2E',
-      textMuted: '#9D4E78',
+      primaryDark:  '#BE185D',
+      accent:       '#FCD34D',
+      background:   '#FFF9FB',
+      surface:      '#FFFFFF',
+      text:         '#3B1A2E',
+      textMuted:    '#9D4E78',
     },
     emoji: '🐝',
   },
@@ -40,14 +25,14 @@ export const themes: Theme[] = [
     name: 'TI & Tecnologia',
     category: 'Profissão',
     colors: {
-      primary: '#3B82F6',
-      primaryLight: '#DBEAFE',
-      primaryDark: '#1E40AF',
-      accent: '#10B981',
-      background: '#0F172A',
-      surface: '#1E293B',
-      text: '#F1F5F9',
-      textMuted: '#94A3B8',
+      primary:      '#6a6a6a',  // cinza médio — bordas e ícones
+      primaryLight: '#1b1b1b',  // cinza muito escuro — fundo inputs/hover
+      primaryDark:  '#ffffff',  // branco — ativos e destaques
+      accent:       '#aaaaaa',  // cinza claro — badges
+      background:   '#000000',  // preto puro
+      surface:      '#111111',  // preto quase total — cards
+      text:         '#ffffff',  // branco
+      textMuted:    '#aaaaaa',  // cinza claro — texto secundário legível
     },
     emoji: '💻',
     backgroundPattern: 'tech',
@@ -57,14 +42,14 @@ export const themes: Theme[] = [
     name: 'Veterinário',
     category: 'Profissão',
     colors: {
-      primary: '#10B981',
-      primaryLight: '#D1FAE5',
-      primaryDark: '#047857',
-      accent: '#F59E0B',
-      background: '#FEFCE8',
-      surface: '#FFFFFF',
-      text: '#365314',
-      textMuted: '#78716C',
+      primary:      '#66BB6A',  // verde médio amigável
+      primaryLight: '#C8E6C9',  // verde claro suave — fundo inputs
+      primaryDark:  '#2E7D32',  // verde escuro confiável
+      accent:       '#66BB6A',  // verde médio
+      background:   '#F1F8F1',  // branco com leve toque verde
+      surface:      '#FFFFFF',  // branco
+      text:         '#263238',  // cinza quase preto
+      textMuted:    '#546E7A',  // cinza médio
     },
     emoji: '🐾',
   },
@@ -149,6 +134,38 @@ export const themes: Theme[] = [
     emoji: '📊',
   },
   {
+    id: 'engineer',
+    name: 'Engenheiro',
+    category: 'Profissão',
+    colors: {
+      primary:      '#1D4ED8',
+      primaryLight: '#DBEAFE',
+      primaryDark:  '#1E3A8A',
+      accent:       '#F97316',
+      background:   '#EFF6FF',
+      surface:      '#FFFFFF',
+      text:         '#1E3A8A',
+      textMuted:    '#3B82F6',
+    },
+    emoji: '⚙️',
+  },
+  {
+    id: 'teacher',
+    name: 'Professor',
+    category: 'Profissão',
+    colors: {
+      primary:      '#4F46E5',
+      primaryLight: '#EEF2FF',
+      primaryDark:  '#3730A3',
+      accent:       '#FB923C',
+      background:   '#F5F3FF',
+      surface:      '#FFFFFF',
+      text:         '#312E81',
+      textMuted:    '#6366F1',
+    },
+    emoji: '📖',
+  },
+  {
     id: 'fitness',
     name: 'Fitness & Saúde',
     category: 'Lifestyle',
@@ -190,23 +207,35 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+const STORAGE_KEY = 'beeplanner_theme';
+
+function applyThemeCSSVars(theme: Theme) {
+  document.documentElement.style.setProperty('--color-primary', theme.colors.primary);
+  document.documentElement.style.setProperty('--color-primary-light', theme.colors.primaryLight);
+  document.documentElement.style.setProperty('--color-primary-dark', theme.colors.primaryDark);
+  document.documentElement.style.setProperty('--color-accent', theme.colors.accent);
+  document.documentElement.style.setProperty('--background', theme.colors.background);
+  document.documentElement.style.setProperty('--color-surface', theme.colors.surface);
+  document.documentElement.style.setProperty('--foreground', theme.colors.text);
+  document.documentElement.style.setProperty('--color-text-muted', theme.colors.textMuted);
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [currentTheme, setCurrentTheme] = useState<Theme>(themes[0]);
+  // Recupera o tema salvo no localStorage, ou usa o padrão
+  const savedId = localStorage.getItem(STORAGE_KEY);
+  const initial = themes.find(t => t.id === savedId) ?? themes[0];
+
+  const [currentTheme, setCurrentTheme] = useState<Theme>(() => {
+    applyThemeCSSVars(initial);
+    return initial;
+  });
 
   const setTheme = (themeId: string) => {
     const theme = themes.find((t) => t.id === themeId);
     if (theme) {
       setCurrentTheme(theme);
-
-      // Update CSS variables
-      document.documentElement.style.setProperty('--color-primary', theme.colors.primary);
-      document.documentElement.style.setProperty('--color-primary-light', theme.colors.primaryLight);
-      document.documentElement.style.setProperty('--color-primary-dark', theme.colors.primaryDark);
-      document.documentElement.style.setProperty('--color-accent', theme.colors.accent);
-      document.documentElement.style.setProperty('--background', theme.colors.background);
-      document.documentElement.style.setProperty('--color-surface', theme.colors.surface);
-      document.documentElement.style.setProperty('--foreground', theme.colors.text);
-      document.documentElement.style.setProperty('--color-text-muted', theme.colors.textMuted);
+      localStorage.setItem(STORAGE_KEY, themeId); // persiste a escolha
+      applyThemeCSSVars(theme);
     }
   };
 

@@ -1,231 +1,374 @@
 import {
-  Camera,
-  Save,
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  Calendar,
-  Palette,
+  Camera, Save, User, Mail, Phone, Calendar, Palette, ShieldCheck, Edit3,
+  Hexagon, Laptop, PawPrint, Stethoscope, Paintbrush, Scale, GraduationCap,
+  BarChart2, Dumbbell, Leaf,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTheme } from "../contexts/ThemeContext";
+import { useAuth } from "../contexts/AuthContext";
+import { fetchMyProfile, updateMyProfile, uploadAvatar } from "../api/profile";
+
+const THEME_ICONS: Record<string, React.ReactNode> = {
+  'bee':           <Hexagon      size={22} strokeWidth={1.5} />,
+  'tech':          <Laptop       size={22} strokeWidth={1.5} />,
+  'veterinary':    <PawPrint     size={22} strokeWidth={1.5} />,
+  'medical':       <Stethoscope  size={22} strokeWidth={1.5} />,
+  'designer':      <Paintbrush   size={22} strokeWidth={1.5} />,
+  'lawyer':        <Scale        size={22} strokeWidth={1.5} />,
+  'student':       <GraduationCap size={22} strokeWidth={1.5} />,
+  'data-analyst':  <BarChart2    size={22} strokeWidth={1.5} />,
+  'fitness':       <Dumbbell     size={22} strokeWidth={1.5} />,
+  'nature':        <Leaf         size={22} strokeWidth={1.5} />,
+};
 
 export function ProfilePage() {
   const { currentTheme, themes, setTheme } = useTheme();
+  const { user } = useAuth();
+  const [editing, setEditing]       = useState(false);
+  const [saving, setSaving]         = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [avatarUrl, setAvatarUrl]   = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Pré-popula imediatamente com dados do auth (sem esperar fetch)
   const [profileData, setProfileData] = useState({
-    name: "Demo User",
-    email: "demo@gmail.com",
-    phone: "+55 (11) 99999-9999",
-    location: "São Paulo, SP",
-    birthdate: "1998-05-15",
-    bio: "Estudante de Ciência da Computação apaixonada por tecnologia e produtividade 🚀",
+    name:      user?.user_metadata?.name  ?? "",
+    email:     user?.email                ?? "",
+    phone:     user?.user_metadata?.phone ?? "",
+    birthdate: "",
+    role:      "user",
   });
 
-  const handleInputChange = (field: string, value: string) => {
-    setProfileData((prev) => ({ ...prev, [field]: value }));
+  // Busca em background os campos extras (phone, birthdate, role, avatar_url)
+  useEffect(() => {
+    fetchMyProfile().then(p => {
+      setProfileData({
+        name:      p.name      ?? user?.user_metadata?.name  ?? "",
+        email:     p.email     ?? user?.email                ?? "",
+        phone:     p.phone     ?? user?.user_metadata?.phone ?? "",
+        birthdate: p.birthdate ?? "",
+        role:      p.role      ?? "user",
+      });
+      // cache-bust ao carregar do banco, garante que a foto mais recente aparece
+      if (p.avatar_url) setAvatarUrl(`${p.avatar_url}?t=${Date.now()}`);
+    });
+  }, []);
+
+  // Faz upload do avatar quando o usuário escolhe um arquivo
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingAvatar(true);
+    try {
+      const url = await uploadAvatar(file);
+      await updateMyProfile({ avatar_url: url });
+      // cache-bust: força o browser a buscar a nova imagem e não servir a antiga
+      setAvatarUrl(`${url}?t=${Date.now()}`);
+    } finally {
+      setUploadingAvatar(false);
+      e.target.value = ""; // limpa o input para permitir re-upload do mesmo arquivo
+    }
   };
 
-  const inputClass = "w-full px-4 py-3 rounded-xl border-2 border-transparent outline-none transition-all";
+  const handleChange = (field: string, value: string) =>
+    setProfileData(prev => ({ ...prev, [field]: value }));
+
+  // Salva as alterações no backend
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const updated = await updateMyProfile({
+        name:      profileData.name      || undefined,
+        phone:     profileData.phone     || undefined,
+        birthdate: profileData.birthdate || undefined,
+      });
+      setProfileData({
+        name:      updated.name      ?? "",
+        email:     updated.email     ?? "",
+        phone:     updated.phone     ?? "",
+        birthdate: updated.birthdate ?? "",
+        role:      updated.role      ?? "user",
+      });
+      setEditing(false);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const roleLabel: Record<string, string> = { user: 'Usuária', pro: 'Pro', admin: 'Admin' };
+
+  // Gera as iniciais do nome para o avatar (ex: "Demo User" → "DU")
+  const initials = profileData.name
+    .split(" ").slice(0, 2)
+    .map((w: string) => w[0]).join("").toUpperCase() || "?";
+
+  const inp = `w-full px-4 py-3 rounded-2xl text-sm outline-none transition-all border-2 border-transparent
+    focus:border-[${currentTheme.colors.primary}]`;
+
 
   return (
-    <div className="flex-1 overflow-auto p-6" style={{ background: currentTheme.colors.background }}>
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <h1
-          className="font-display mb-8 text-[40px] font-bold"
-          style={{ color: currentTheme.colors.text }}
-        >
-          Meu Perfil
-        </h1>
+    <div
+      className="flex-1"
+      style={{ background: currentTheme.colors.background, fontFamily: "'Montserrat', sans-serif", display: 'flex', flexDirection: 'column' }}
+    >
+      {/* layout: grid 2 colunas — preenche toda a altura disponível */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 20, padding: '48px 80px', flex: 1, alignItems: 'stretch' }}>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Profile Picture Card */}
-          <div className="lg:col-span-1">
-            <div
-              className="rounded-2xl p-6 text-center"
-              style={{ background: currentTheme.colors.surface, boxShadow: `0 2px 16px ${currentTheme.colors.primary}15` }}
-            >
-              <div className="relative inline-block mb-4">
-                <div
-                  className="w-32 h-32 rounded-full flex items-center justify-center text-6xl"
-                  style={{ background: currentTheme.colors.primaryLight }}
-                >
-                  👤
-                </div>
+        {/* ── COLUNA ESQUERDA ── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+          {/* BANNER + AVATAR */}
+          <div className="rounded-2xl overflow-hidden" style={{ boxShadow: `0 4px 24px ${currentTheme.colors.primary}20` }}>
+            <div style={{
+              height: 130,
+              background: 'linear-gradient(135deg, #BE185D 0%, #F472B6 55%, #FCD34D 100%)',
+              position: 'relative',
+            }}>
+              <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: .08 }} viewBox="0 0 400 130" preserveAspectRatio="xMidYMid slice">
+                <circle cx="320" cy="-30" r="140" fill="white"/>
+                <circle cx="60"  cy="160" r="100" fill="white"/>
+              </svg>
+            </div>
+
+            <div style={{ background: currentTheme.colors.surface, padding: '0 24px 20px', position: 'relative' }}>
+              {/* input oculto para seleção de arquivo */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={handleAvatarChange}
+              />
+
+              <div style={{ position: 'relative', display: 'inline-block', marginTop: -44 }}>
+                {/* exibe foto se tiver, senão exibe iniciais */}
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt="avatar"
+                    style={{
+                      width: 88, height: 88, borderRadius: '50%',
+                      objectFit: 'cover',
+                      border: `4px solid ${currentTheme.colors.surface}`,
+                      boxShadow: `0 6px 20px ${currentTheme.colors.primary}30`,
+                    }}
+                  />
+                ) : (
+                  <div style={{
+                    width: 88, height: 88, borderRadius: '50%',
+                    background: `linear-gradient(135deg, ${currentTheme.colors.primaryLight}, ${currentTheme.colors.primary}40)`,
+                    border: `4px solid ${currentTheme.colors.surface}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 28, fontWeight: 800, color: currentTheme.colors.primaryDark,
+                    boxShadow: `0 6px 20px ${currentTheme.colors.primary}30`,
+                    letterSpacing: '-1px',
+                  }}>
+                    {initials}
+                  </div>
+                )}
+
                 <button
-                  className="absolute bottom-0 right-0 w-10 h-10 rounded-full text-white flex items-center justify-center hover:opacity-90 transition-all"
-                  style={{ background: currentTheme.colors.primary }}
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingAvatar}
+                  title="Alterar foto"
+                  style={{
+                    position: 'absolute', bottom: 2, right: 2,
+                    width: 28, height: 28, borderRadius: '50%',
+                    background: uploadingAvatar ? currentTheme.colors.textMuted : currentTheme.colors.primary,
+                    border: `3px solid ${currentTheme.colors.surface}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: uploadingAvatar ? 'not-allowed' : 'pointer',
+                    transition: 'opacity .2s',
+                  }}
+                  onMouseEnter={e => { if (!uploadingAvatar) e.currentTarget.style.opacity = '.85'; }}
+                  onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
                 >
-                  <Camera className="w-5 h-5" />
+                  <Camera size={12} color="white" />
                 </button>
               </div>
-              <h2
-                className="font-display mb-1 text-2xl font-semibold"
-                style={{ color: currentTheme.colors.text }}
-              >
-                {profileData.name}
-              </h2>
-              <p className="text-sm" style={{ color: currentTheme.colors.textMuted }}>
-                {profileData.email}
-              </p>
+
+              <div className="flex items-start justify-between mt-2">
+                <div>
+                  <h2 style={{ fontSize: 19, fontWeight: 700, color: currentTheme.colors.text, marginBottom: 2 }}>
+                    {profileData.name}
+                  </h2>
+                </div>
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  padding: '4px 11px', borderRadius: 99,
+                  background: currentTheme.colors.primaryLight,
+                  fontSize: 11, fontWeight: 600, color: currentTheme.colors.primaryDark,
+                  marginTop: 4,
+                }}>
+                  <ShieldCheck size={12} />
+                  {roleLabel[profileData.role] ?? 'Usuária'}
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Profile Info Card */}
-          <div className="lg:col-span-2">
-            <div
-              className="rounded-2xl p-6"
-              style={{ background: currentTheme.colors.surface, boxShadow: `0 2px 16px ${currentTheme.colors.primary}15` }}
-            >
-              <h3
-                className="font-display mb-6 text-[22px] font-semibold"
-                style={{ color: currentTheme.colors.text }}
-              >
+          {/* FORMULÁRIO */}
+          <div className="rounded-2xl p-5 flex-1" style={{
+            background: currentTheme.colors.surface,
+            boxShadow: `0 4px 24px ${currentTheme.colors.primaryDark}18`,
+          }}>
+            <div className="flex items-center justify-between mb-5">
+              <h3 style={{ fontSize: 15, fontWeight: 700, color: currentTheme.colors.text, display: 'flex', alignItems: 'center', gap: 7 }}>
+                <User size={16} color={currentTheme.colors.primary} />
                 Informações Pessoais
               </h3>
+              <button
+                onClick={() => setEditing(e => !e)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  padding: '5px 12px', borderRadius: 99,
+                  background: editing ? currentTheme.colors.primaryLight : 'transparent',
+                  border: `1.5px solid ${currentTheme.colors.primary}40`,
+                  fontSize: 11, fontWeight: 600, color: currentTheme.colors.primaryDark,
+                  cursor: 'pointer', transition: 'all .2s',
+                }}
+              >
+                <Edit3 size={12} />
+                {editing ? 'Editando' : 'Editar'}
+              </button>
+            </div>
 
-              <div className="space-y-4">
-                {[
-                  { field: "name", label: "Nome Completo", type: "text", icon: <User className="w-4 h-4" />, value: profileData.name },
-                  { field: "email", label: "Email", type: "email", icon: <Mail className="w-4 h-4" />, value: profileData.email },
-                  { field: "location", label: "Localização", type: "text", icon: <MapPin className="w-4 h-4" />, value: profileData.location },
-                ].map(({ field, label, type, icon, value }) => (
-                  <div key={field}>
-                    <label
-                      className="flex items-center gap-2 mb-2 text-sm font-medium"
-                      style={{ color: currentTheme.colors.text }}
-                    >
-                      {icon}
-                      {label}
-                    </label>
-                    <input
-                      type={type}
-                      value={value}
-                      onChange={(e) => handleInputChange(field, e.target.value)}
-                      className={inputClass}
-                      style={{ background: currentTheme.colors.primaryLight, color: currentTheme.colors.text }}
-                      onFocus={(e) => (e.target.style.borderColor = currentTheme.colors.primary)}
-                      onBlur={(e) => (e.target.style.borderColor = "transparent")}
-                    />
-                  </div>
-                ))}
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      className="flex items-center gap-2 mb-2 text-sm font-medium"
-                      style={{ color: currentTheme.colors.text }}
-                    >
-                      <Phone className="w-4 h-4" />
-                      Telefone
-                    </label>
-                    <input
-                      type="tel"
-                      value={profileData.phone}
-                      onChange={(e) => handleInputChange("phone", e.target.value)}
-                      className={inputClass}
-                      style={{ background: currentTheme.colors.primaryLight, color: currentTheme.colors.text }}
-                      onFocus={(e) => (e.target.style.borderColor = currentTheme.colors.primary)}
-                      onBlur={(e) => (e.target.style.borderColor = "transparent")}
-                    />
-                  </div>
-                  <div>
-                    <label
-                      className="flex items-center gap-2 mb-2 text-sm font-medium"
-                      style={{ color: currentTheme.colors.text }}
-                    >
-                      <Calendar className="w-4 h-4" />
-                      Data de Nascimento
-                    </label>
-                    <input
-                      type="date"
-                      value={profileData.birthdate}
-                      onChange={(e) => handleInputChange("birthdate", e.target.value)}
-                      className={inputClass}
-                      style={{ background: currentTheme.colors.primaryLight, color: currentTheme.colors.text }}
-                      onFocus={(e) => (e.target.style.borderColor = currentTheme.colors.primary)}
-                      onBlur={(e) => (e.target.style.borderColor = "transparent")}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label
-                    className="flex items-center gap-2 mb-2 text-sm font-medium"
-                    style={{ color: currentTheme.colors.text }}
-                  >
-                    Bio
-                  </label>
-                  <textarea
-                    value={profileData.bio}
-                    onChange={(e) => handleInputChange("bio", e.target.value)}
-                    rows={3}
-                    className={`${inputClass} resize-none`}
-                    style={{ background: currentTheme.colors.primaryLight, color: currentTheme.colors.text }}
-                    onFocus={(e) => (e.target.style.borderColor = currentTheme.colors.primary)}
-                    onBlur={(e) => (e.target.style.borderColor = "transparent")}
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Nome Completo" icon={<User size={13}/>} color={currentTheme.colors}>
+                  <input
+                    type="text" value={profileData.name} disabled={!editing}
+                    onChange={e => handleChange("name", e.target.value)}
+                    className={inp}
+                    style={{ background: currentTheme.colors.primaryLight, color: currentTheme.colors.text, opacity: editing ? 1 : .75 }}
+                    onFocus={e => (e.target.style.borderColor = currentTheme.colors.primary)}
+                    onBlur={e  => (e.target.style.borderColor = "transparent")}
                   />
-                </div>
-
-                <button
-                  className="px-6 py-3 rounded-full text-white flex items-center gap-2 hover:opacity-90 transition-all"
-                  style={{ background: currentTheme.colors.primary }}
-                >
-                  <Save className="w-5 h-5" />
-                  Salvar Alterações
-                </button>
+                </Field>
+                <Field label="E-mail" icon={<Mail size={13}/>} color={currentTheme.colors}>
+                  <input
+                    type="email" value={profileData.email} disabled
+                    className={inp}
+                    style={{ background: currentTheme.colors.primaryLight, color: currentTheme.colors.text, opacity: .6, cursor: 'not-allowed' }}
+                    onFocus={e => (e.target.style.borderColor = currentTheme.colors.primary)}
+                    onBlur={e  => (e.target.style.borderColor = "transparent")}
+                  />
+                </Field>
               </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Telefone" icon={<Phone size={13}/>} color={currentTheme.colors}>
+                  <input
+                    type="tel" value={profileData.phone} disabled={!editing}
+                    onChange={e => handleChange("phone", e.target.value)}
+                    className={inp}
+                    style={{ background: currentTheme.colors.primaryLight, color: currentTheme.colors.text, opacity: editing ? 1 : .75 }}
+                    onFocus={e => (e.target.style.borderColor = currentTheme.colors.primary)}
+                    onBlur={e  => (e.target.style.borderColor = "transparent")}
+                  />
+                </Field>
+                <Field label="Data de Nascimento" icon={<Calendar size={13}/>} color={currentTheme.colors}>
+                  <input
+                    type="date" value={profileData.birthdate} disabled={!editing}
+                    onChange={e => handleChange("birthdate", e.target.value)}
+                    className={inp}
+                    style={{ background: currentTheme.colors.primaryLight, color: currentTheme.colors.text, opacity: editing ? 1 : .75 }}
+                    onFocus={e => (e.target.style.borderColor = currentTheme.colors.primary)}
+                    onBlur={e  => (e.target.style.borderColor = "transparent")}
+                  />
+                </Field>
+              </div>
+
+              {editing && (
+                <div className="flex justify-end pt-1">
+                  <button
+                    onClick={handleSave}
+                    disabled={saving}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 7,
+                      padding: '10px 24px', borderRadius: 99,
+                      background: `linear-gradient(135deg, ${currentTheme.colors.primaryDark}, ${currentTheme.colors.primary})`,
+                      color: 'white', fontSize: 13, fontWeight: 600,
+                      border: 'none', cursor: saving ? 'not-allowed' : 'pointer',
+                      opacity: saving ? 0.7 : 1,
+                      boxShadow: `0 6px 18px ${currentTheme.colors.primary}40`,
+                      transition: 'transform .2s, box-shadow .2s',
+                    }}
+                    onMouseEnter={e => { if (!saving) { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = `0 10px 24px ${currentTheme.colors.primary}55`; }}}
+                    onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = `0 6px 18px ${currentTheme.colors.primary}40`; }}
+                  >
+                    <Save size={14} />
+                    {saving ? 'Salvando...' : 'Salvar Alterações'}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Theme Selector */}
-        <div
-          className="mt-6 rounded-2xl p-6"
-          style={{ background: currentTheme.colors.surface, boxShadow: `0 2px 16px ${currentTheme.colors.primary}15` }}
-        >
-          <div className="flex items-center gap-2 mb-6">
-            <Palette className="w-5 h-5" style={{ color: currentTheme.colors.primary }} />
-            <h3
-              className="font-display text-[22px] font-semibold"
-              style={{ color: currentTheme.colors.text }}
-            >
-              Temas Disponíveis
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            {themes.map((theme) => (
+        {/* ── COLUNA DIREITA: SELETOR DE TEMA ── */}
+        <div style={{
+          borderRadius: 16, padding: 20,
+          background: currentTheme.colors.surface,
+          boxShadow: `0 4px 24px ${currentTheme.colors.primaryDark}18`,
+        }}>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: currentTheme.colors.text, display: 'flex', alignItems: 'center', gap: 7, marginBottom: 16 }}>
+            <Palette size={16} color={currentTheme.colors.primary} />
+            Temas
+          </h3>
+          <div className="grid grid-cols-2 gap-2" style={{ alignItems: 'stretch' }}>
+            {themes.map(theme => (
               <button
                 key={theme.id}
                 onClick={() => setTheme(theme.id)}
-                className="p-4 rounded-xl border-2 transition-all hover:scale-105"
                 style={{
-                  borderColor: currentTheme.id === theme.id ? currentTheme.colors.primary : "transparent",
+                  padding: '12px 8px', borderRadius: 14,
+                  border: `2px solid ${currentTheme.id === theme.id ? currentTheme.colors.primary : 'transparent'}`,
                   background: theme.colors.primaryLight,
+                  cursor: 'pointer', transition: 'all .22s',
+                  transform: currentTheme.id === theme.id ? 'scale(1.04)' : 'scale(1)',
+                  boxShadow: currentTheme.id === theme.id ? `0 4px 16px ${theme.colors.primary}30` : 'none',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                 }}
+                onMouseEnter={e => { if (currentTheme.id !== theme.id) e.currentTarget.style.transform = 'scale(1.03)'; }}
+                onMouseLeave={e => { if (currentTheme.id !== theme.id) e.currentTarget.style.transform = 'scale(1)'; }}
               >
-                <div className="text-4xl mb-2">{theme.emoji}</div>
-                <p
-                  className="font-montserrat mb-1 text-sm font-semibold"
-                  style={{ color: theme.colors.text }}
-                >
-                  {theme.name}
-                </p>
-                <p className="text-[11px]" style={{ color: theme.colors.textMuted }}>
-                  {theme.category}
-                </p>
-                <div className="flex gap-1 mt-2">
-                  <div className="w-4 h-4 rounded-full" style={{ background: theme.colors.primary }} />
-                  <div className="w-4 h-4 rounded-full" style={{ background: theme.colors.accent }} />
-                  <div className="w-4 h-4 rounded-full" style={{ background: theme.colors.primaryDark }} />
+                <div style={{ marginBottom: 6, display: 'flex', justifyContent: 'center', color: theme.colors.primaryDark }}>{THEME_ICONS[theme.id]}</div>
+                <p style={{ fontSize: 11, fontWeight: 700, color: theme.colors.primaryDark, marginBottom: 1 }}>{theme.name}</p>
+                <p style={{ fontSize: 9, color: theme.colors.primaryDark, opacity: 0.6, marginBottom: 6 }}>{theme.category}</p>
+                <div style={{ display: 'flex', gap: 3, justifyContent: 'center' }}>
+                  {[theme.colors.primary, theme.colors.accent, theme.colors.primaryDark].map((c, i) => (
+                    <div key={i} style={{ width: 10, height: 10, borderRadius: '50%', background: c }} />
+                  ))}
                 </div>
               </button>
             ))}
           </div>
         </div>
+
       </div>
+    </div>
+  );
+}
+
+// Componente auxiliar para campo com label + ícone
+function Field({ label, icon, children, color }: {
+  label: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+  color: any;
+}) {
+  return (
+    <div>
+      <label style={{
+        display: 'flex', alignItems: 'center', gap: 6,
+        fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
+        letterSpacing: '0.07em', color: color.textMuted, marginBottom: 7,
+      }}>
+        <span style={{ color: color.primary }}>{icon}</span>
+        {label}
+      </label>
+      {children}
     </div>
   );
 }

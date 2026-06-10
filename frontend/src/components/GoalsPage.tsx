@@ -126,8 +126,8 @@ function GoalCard({ goal, onDelete, onEdit }: { goal: Goal; onDelete: () => void
       </div>
       {done && (
         <div className="flex items-center gap-1.5 mt-2">
-          <Trophy className="w-4 h-4 text-yellow-500" />
-          <span className="text-xs font-semibold text-yellow-600">Meta concluída!</span>
+          <Trophy className="w-4 h-4" style={{ color: currentTheme.colors.accent }} />
+          <span className="text-xs font-semibold" style={{ color: currentTheme.colors.accent }}>Meta concluída!</span>
         </div>
       )}
     </div>
@@ -246,7 +246,7 @@ export function GoalsPage() {
         </div>
         <div className="rounded-2xl p-4" style={{ background: currentTheme.colors.surface, boxShadow: `0 2px 12px ${currentTheme.colors.primary}10` }}>
           <p className="text-xs mb-1" style={{ color: currentTheme.colors.textMuted }}>Concluídas</p>
-          <p className="text-3xl font-bold text-green-500">{completedCount}</p>
+          <p className="text-3xl font-bold" style={{ color: currentTheme.colors.primary }}>{completedCount}</p>
         </div>
         <div className="rounded-2xl p-4" style={{ background: currentTheme.colors.surface, boxShadow: `0 2px 12px ${currentTheme.colors.primary}10` }}>
           <p className="text-xs mb-1 mb-2" style={{ color: currentTheme.colors.textMuted }}>Progresso Geral</p>

@@ -1,28 +1,39 @@
 import { useEffect } from "react";
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import { ThemeProvider } from "./contexts/ThemeContext";
+import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
+
+import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import Welcome from "./components/Welcome";
-import { Login } from "./components/Login";
+import { SettingsProvider } from "./contexts/SettingsContext";
+import Welcome from "./pages/Welcome";
+import { LoginPage } from "./pages/LoginPage";
 import { Sidebar } from "./components/Sidebar";
-import { Dashboard } from "./components/Dashboard";
-import { BooksPage } from "./components/BooksPage";
-import { UniversityPage } from "./components/UniversityPage";
-import { CalendarPage } from "./components/CalendarPage";
-import { NotesPage } from "./components/NotesPage";
-import { CoursesPage } from "./components/CoursesPage";
-import { AnalyticsPage } from "./components/AnalyticsPage";
-import { ProfilePage } from "./components/ProfilePage";
-import { SettingsPage } from "./components/SettingsPage";
-import { WeekPage } from "./components/WeekPage";
-import { HabitsPage } from "./components/HabitsPage";
-import { FinancePage } from "./components/FinancePage";
-import { HealthPage } from "./components/HealthPage";
-import { GoalsPage } from "./components/GoalsPage";
+import { DashboardPage } from "./pages/DashboardPage";
+import { BooksPage } from "./pages/BooksPage";
+import { UniversityPage } from "./pages/UniversityPage";
+import { CalendarPage } from "./pages/CalendarPage";
+import { NotesPage } from "./pages/NotesPage";
+import { CoursesPage } from "./pages/CoursesPage";
+import { AnalyticsPage } from "./pages/AnalyticsPage";
+import { ProfilePage } from "./pages/ProfilePage";
+import { SettingsPage } from "./pages/SettingsPage";
+import { WeekPage } from "./pages/WeekPage";
+import { HabitsPage } from "./pages/HabitsPage";
+import { FinancePage } from "./pages/FinancePage";
+import { HealthPage } from "./pages/HealthPage";
+import { GoalsPage } from "./pages/GoalsPage";
+import { ToastProvider } from "./components/Toast";
+import { PageLayout } from "./components/PageLayout";
 
 function AppLayout() {
   const { signOut } = useAuth();
+  const { currentTheme } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Aplica grayscale em todas as páginas no tema TI, exceto /perfil (para preservar a foto do usuário)
+  const grayscaleFilter = currentTheme.id === 'tech' && location.pathname !== '/perfil'
+    ? 'grayscale(1)'
+    : 'none';
 
   const handleLogout = async () => {
     await signOut();
@@ -32,24 +43,29 @@ function AppLayout() {
   return (
     <div className="h-screen flex overflow-hidden">
       <Sidebar onLogout={handleLogout} />
-      <div className="flex-1 overflow-hidden">
-        <Routes>
-          <Route path="/inicio"        element={<Dashboard userName="Usuária" />} />
-          <Route path="/analytics"     element={<AnalyticsPage />} />
-          <Route path="/semana"        element={<WeekPage />} />
-          <Route path="/habitos"       element={<HabitsPage />} />
-          <Route path="/datas"         element={<CalendarPage />} />
-          <Route path="/notas"         element={<NotesPage />} />
-          <Route path="/livros"        element={<BooksPage />} />
-          <Route path="/cursos"        element={<CoursesPage />} />
-          <Route path="/universitario" element={<UniversityPage />} />
-          <Route path="/financas"      element={<FinancePage />} />
-          <Route path="/saude"         element={<HealthPage />} />
-          <Route path="/metas"         element={<GoalsPage />} />
-          <Route path="/perfil"        element={<ProfilePage />} />
-          <Route path="/configuracoes" element={<SettingsPage />} />
-          <Route path="*"              element={<Navigate to="/inicio" replace />} />
-        </Routes>
+      <div
+        className="flex-1 flex overflow-hidden"
+        style={{ filter: grayscaleFilter }}
+      >
+        <PageLayout>
+          <Routes>
+            <Route path="/inicio"        element={<DashboardPage userName="Usuária" />} />
+            <Route path="/dashboard"     element={<AnalyticsPage />} />
+            <Route path="/semana"        element={<WeekPage />} />
+            <Route path="/habitos"       element={<HabitsPage />} />
+            <Route path="/datas"         element={<CalendarPage />} />
+            <Route path="/notas"         element={<NotesPage />} />
+            <Route path="/livros"        element={<BooksPage />} />
+            <Route path="/cursos"        element={<CoursesPage />} />
+            <Route path="/universitario" element={<UniversityPage />} />
+            <Route path="/financas"      element={<FinancePage />} />
+            <Route path="/saude"         element={<HealthPage />} />
+            <Route path="/metas"         element={<GoalsPage />} />
+            <Route path="/perfil"        element={<ProfilePage />} />
+            <Route path="/configuracoes" element={<SettingsPage />} />
+            <Route path="*"              element={<Navigate to="/inicio" replace />} />
+          </Routes>
+        </PageLayout>
       </div>
     </div>
   );
@@ -58,10 +74,15 @@ function AppLayout() {
 function AppContent() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (!loading && user) {
-      navigate("/inicio");
+      // Só redireciona se estiver em página de auth — mantém rota atual em refresh
+      const authPaths = ['/', '/login']
+      if (authPaths.includes(location.pathname)) {
+        navigate("/inicio");
+      }
     }
   }, [user, loading]);
 
@@ -91,7 +112,7 @@ function AppContent() {
         {/* /login?mode=register → abre aba "Criar conta" (cadastro 3 etapas) */}
         <Route
           path="/login"
-          element={<Login onLogin={() => navigate("/inicio")} />}
+          element={<LoginPage onLogin={() => navigate("/inicio")} />}
         />
 
         <Route path="*" element={<Navigate to="/" replace />} />
@@ -106,7 +127,11 @@ export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <AppContent />
+        <SettingsProvider>
+          <ToastProvider>
+            <AppContent />
+          </ToastProvider>
+        </SettingsProvider>
       </AuthProvider>
     </ThemeProvider>
   );

@@ -34,9 +34,9 @@ const initialTasks: Task[] = [
 ];
 
 const upcomingDates = [
-  { id: 1, date: "05", month: "MAI", title: "Aniversário da mamãe", type: "Pessoal", color: "#F472B6" },
-  { id: 2, date: "12", month: "MAI", title: "Prova de Cálculo II", type: "Universitário", color: "#FCD34D" },
-  { id: 3, date: "20", month: "MAI", title: "Entrega de TCC", type: "Universitário", color: "#BE185D" },
+  { id: 1, date: "05", month: "MAI", title: "Aniversário da mamãe", type: "Pessoal" },
+  { id: 2, date: "12", month: "MAI", title: "Prova de Cálculo II", type: "Universitário" },
+  { id: 3, date: "20", month: "MAI", title: "Entrega de TCC", type: "Universitário" },
 ];
 
 const weekDays = ["SEG", "TER", "QUA", "QUI", "SEX", "SAB", "DOM"];
@@ -128,9 +128,9 @@ export function Dashboard({ userName = "Usuária" }: DashboardProps) {
       <div className="grid grid-cols-4 gap-3 px-4 mt-4">
         {[
           { icon: CheckSquare, label: "pendentes", value: pendingCount, iconBg: currentTheme.colors.primaryLight, iconColor: currentTheme.colors.primary },
-          { icon: TrendingUp, label: "concluídas", value: completedCount, iconBg: "#D1FAE5", iconColor: "#10B981" },
-          { icon: Zap, label: "hábitos", value: 7, iconBg: "#FEF3C7", iconColor: "#F59E0B" },
-          { icon: BookOpen, label: "livros", value: 2, iconBg: "#E9D5FF", iconColor: "#A855F7" },
+          { icon: TrendingUp, label: "concluídas", value: completedCount, iconBg: currentTheme.colors.primaryLight, iconColor: currentTheme.colors.primaryDark },
+          { icon: Zap, label: "hábitos", value: 7, iconBg: currentTheme.colors.primaryLight, iconColor: currentTheme.colors.accent },
+          { icon: BookOpen, label: "livros", value: 2, iconBg: currentTheme.colors.primaryLight, iconColor: currentTheme.colors.textMuted },
         ].map(({ icon: Icon, label, value, iconBg, iconColor }) => (
           <div
             key={label}
@@ -169,8 +169,8 @@ export function Dashboard({ userName = "Usuária" }: DashboardProps) {
                   <p className="text-base font-semibold mt-0.5" style={{ color: isToday ? "#fff" : currentTheme.colors.text }}>{weekDates[index]}</p>
                   <div className="flex gap-0.5 mt-1">
                     <div className="w-1 h-1 rounded-full" style={{ background: isToday ? "rgba(255,255,255,0.7)" : currentTheme.colors.primary }} />
-                    <div className="w-1 h-1 rounded-full bg-[#10B981]" />
-                    <div className="w-1 h-1 rounded-full bg-[#FCD34D]" />
+                    <div className="w-1 h-1 rounded-full" style={{ background: isToday ? "rgba(255,255,255,0.5)" : currentTheme.colors.accent }} />
+                    <div className="w-1 h-1 rounded-full" style={{ background: isToday ? "rgba(255,255,255,0.3)" : currentTheme.colors.primaryDark }} />
                   </div>
                 </div>
               );
@@ -256,13 +256,13 @@ export function Dashboard({ userName = "Usuária" }: DashboardProps) {
                 onClick={() => toggleTask(task.id)}
                 className="flex flex-col gap-2 p-3 rounded-lg transition-all cursor-pointer border-l-4 hover:opacity-80 shrink-0 w-48"
                 style={{
-                  borderColor: task.completed ? "#10B981" : currentTheme.colors.primary,
-                  background: task.completed ? "#F0FDF4" : currentTheme.colors.background,
+                  borderColor: task.completed ? currentTheme.colors.accent : currentTheme.colors.primary,
+                  background: task.completed ? currentTheme.colors.primaryLight : currentTheme.colors.background,
                 }}
               >
                 <div className="flex items-start gap-2">
                   {task.completed
-                    ? <CheckCircle className="w-4 h-4 flex-shrink-0 text-[#10B981] mt-0.5" />
+                    ? <CheckCircle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: currentTheme.colors.accent }} />
                     : <Circle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: currentTheme.colors.primary }} />
                   }
                   <p
@@ -280,8 +280,8 @@ export function Dashboard({ userName = "Usuária" }: DashboardProps) {
                   <span
                     className="px-1.5 py-0.5 rounded-full text-[10px]"
                     style={{
-                      background: task.priority === "alta" ? currentTheme.colors.primaryLight : "#FEF3C7",
-                      color: task.priority === "alta" ? currentTheme.colors.primaryDark : "#92400E",
+                      background: currentTheme.colors.primaryLight,
+                      color: task.priority === "alta" ? currentTheme.colors.primaryDark : currentTheme.colors.textMuted,
                     }}
                   >
                     {task.category}
@@ -327,33 +327,37 @@ export function Dashboard({ userName = "Usuária" }: DashboardProps) {
               minHeight: "160px",
             }}
           >
-            {upcomingDates.map((event) => (
-              <div
-                key={event.id}
-                className="flex flex-col gap-2 p-3 rounded-lg hover:opacity-80 transition-all cursor-pointer border-l-4 shrink-0 w-40"
-                style={{
-                  borderColor: event.color,
-                  background: currentTheme.colors.background,
-                }}
-              >
+            {upcomingDates.map((event, idx) => {
+              const dateAccentColors = [currentTheme.colors.primary, currentTheme.colors.accent, currentTheme.colors.primaryDark];
+              const accentColor = dateAccentColors[idx % dateAccentColors.length];
+              return (
                 <div
-                  className="w-10 h-10 rounded-lg flex flex-col items-center justify-center"
-                  style={{ background: currentTheme.colors.primaryLight }}
+                  key={event.id}
+                  className="flex flex-col gap-2 p-3 rounded-lg hover:opacity-80 transition-all cursor-pointer border-l-4 shrink-0 w-40"
+                  style={{
+                    borderColor: accentColor,
+                    background: currentTheme.colors.background,
+                  }}
                 >
-                  <p className="text-base font-bold leading-none" style={{ color: currentTheme.colors.primary }}>{event.date}</p>
-                  <p className="text-[9px] mt-0.5" style={{ color: currentTheme.colors.textMuted }}>{event.month}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-medium leading-snug" style={{ color: currentTheme.colors.text }}>{event.title}</p>
-                  <span
-                    className="inline-block mt-1 px-1.5 py-0.5 rounded-full text-[10px]"
-                    style={{ background: event.color + "20", color: event.color }}
+                  <div
+                    className="w-10 h-10 rounded-lg flex flex-col items-center justify-center"
+                    style={{ background: currentTheme.colors.primaryLight }}
                   >
-                    {event.type}
-                  </span>
+                    <p className="text-base font-bold leading-none" style={{ color: currentTheme.colors.primary }}>{event.date}</p>
+                    <p className="text-[9px] mt-0.5" style={{ color: currentTheme.colors.textMuted }}>{event.month}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium leading-snug" style={{ color: currentTheme.colors.text }}>{event.title}</p>
+                    <span
+                      className="inline-block mt-1 px-1.5 py-0.5 rounded-full text-[10px]"
+                      style={{ background: currentTheme.colors.primaryLight, color: accentColor }}
+                    >
+                      {event.type}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 

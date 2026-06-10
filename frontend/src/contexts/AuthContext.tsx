@@ -1,13 +1,13 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { User, Session } from '@supabase/supabase-js'
-import { supabase } from '../api/supabase'
+import { supabase } from '../lib/supabase'
 
 interface AuthContextType {
   user: User | null
   session: Session | null
   loading: boolean
   signIn: (email: string, password: string) => Promise<void>
-  signUp: (email: string, password: string, name: string, phone?: string) => Promise<void>
+  signUp: (email: string, password: string, name: string, phone?: string) => Promise<boolean>
   signOut: () => Promise<void>
 }
 
@@ -38,16 +38,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error
   }
 
-  const signUp = async (email: string, password: string, name: string, phone?: string) => {
-    const { error } = await supabase.auth.signUp({
+  const signUp = async (email: string, password: string, name: string, phone?: string): Promise<boolean> => {
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { name, phone } } // phone vai para raw_user_meta_data → trigger salva em profiles
+      options: { data: { name, phone } }
     })
     if (error) throw error
+    // Com confirmação de e-mail desativada, Supabase retorna sessão imediata
+    if (data.session) {
+      setSession(data.session)
+      setUser(data.session.user)
+      return true
+    }
+    return false
   }
 
   const signOut = async () => {
+    // Remove chave legada sem escopo de userId (bug de foto compartilhada entre usuários)
+    localStorage.removeItem('beeplanner_avatar_url')
     await supabase.auth.signOut()
   }
 

@@ -134,7 +134,7 @@ export function Login({ onLogin }: LoginProps) {
 
   return (
     <div className="min-h-screen flex bg-[#FFF8F5] text-[#3D2B2B]"
-      style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+      style={{ fontFamily: "'Montserrat', sans-serif" }}>
 
       {/* ── PAINEL ESQUERDO ── */}
       <aside className="hidden lg:flex w-[440px] min-w-[440px] flex-col justify-between p-12 relative overflow-hidden"

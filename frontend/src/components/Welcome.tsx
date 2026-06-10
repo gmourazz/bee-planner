@@ -95,7 +95,7 @@ export default function Welcome({ onLoginClick, onGetStarted }: WelcomeProps) {
   }, []);
 
   return (
-    <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", background: 'var(--bg)', color: 'var(--text)', overflowX: 'hidden' }}>
+    <div style={{ fontFamily: "'Montserrat', sans-serif", background: 'var(--bg)', color: 'var(--text)', overflowX: 'hidden' }}>
 
       {/* ── NAV ── */}
       <nav style={{

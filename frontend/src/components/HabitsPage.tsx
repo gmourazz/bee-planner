@@ -6,21 +6,48 @@ import {
   Trophy,
   ChevronLeft,
   ChevronRight,
+  Droplets,
+  Activity,
+  BookOpen,
+  Brain,
+  Leaf,
+  Moon,
+  PenLine,
+  Music,
+  Dumbbell,
+  Zap,
+  type LucideIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
 
+type HabitIconKey = "droplets" | "activity" | "bookopen" | "brain" | "leaf" | "moon" | "penline" | "music" | "dumbbell" | "zap";
+
+const HABIT_ICON_MAP: Record<HabitIconKey, LucideIcon> = {
+  droplets: Droplets,
+  activity: Activity,
+  bookopen: BookOpen,
+  brain: Brain,
+  leaf: Leaf,
+  moon: Moon,
+  penline: PenLine,
+  music: Music,
+  dumbbell: Dumbbell,
+  zap: Zap,
+};
+
+const HABIT_ICON_KEYS = Object.keys(HABIT_ICON_MAP) as HabitIconKey[];
+
 interface Habit {
   id: number;
   name: string;
-  emoji: string;
+  iconKey: HabitIconKey;
   color: string;
   completions: Record<string, boolean>;
   streak: number;
 }
 
 const COLORS = ["#F472B6", "#A855F7", "#3B82F6", "#10B981", "#F59E0B", "#EF4444"];
-const EMOJIS = ["💧", "🏃", "📚", "🧘", "🥗", "💤", "✍️", "🎵", "🌿", "💪"];
 
 const DAYS_SHORT = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
@@ -48,10 +75,10 @@ function calcStreak(completions: Record<string, boolean>) {
 let nextId = 1;
 
 const defaultHabits: Habit[] = [
-  { id: nextId++, name: "Beber 2L de água", emoji: "💧", color: "#3B82F6", completions: {}, streak: 0 },
-  { id: nextId++, name: "Exercitar 30 min", emoji: "🏃", color: "#10B981", completions: {}, streak: 0 },
-  { id: nextId++, name: "Ler 20 páginas", emoji: "📚", color: "#A855F7", completions: {}, streak: 0 },
-  { id: nextId++, name: "Meditar", emoji: "🧘", color: "#F472B6", completions: {}, streak: 0 },
+  { id: nextId++, name: "Beber 2L de água", iconKey: "droplets", color: "#3B82F6", completions: {}, streak: 0 },
+  { id: nextId++, name: "Exercitar 30 min", iconKey: "activity", color: "#10B981", completions: {}, streak: 0 },
+  { id: nextId++, name: "Ler 20 páginas", iconKey: "bookopen", color: "#A855F7", completions: {}, streak: 0 },
+  { id: nextId++, name: "Meditar", iconKey: "brain", color: "#F472B6", completions: {}, streak: 0 },
 ];
 
 export function HabitsPage() {
@@ -59,7 +86,7 @@ export function HabitsPage() {
   const [habits, setHabits] = useState<Habit[]>(defaultHabits);
   const [showAdd, setShowAdd] = useState(false);
   const [newName, setNewName] = useState("");
-  const [newEmoji, setNewEmoji] = useState("💧");
+  const [newIconKey, setNewIconKey] = useState<HabitIconKey>("droplets");
   const [newColor, setNewColor] = useState(COLORS[0]);
   const [weekOffset, setWeekOffset] = useState(0);
 
@@ -85,10 +112,10 @@ export function HabitsPage() {
     if (!newName.trim()) return;
     setHabits((prev) => [
       ...prev,
-      { id: nextId++, name: newName.trim(), emoji: newEmoji, color: newColor, completions: {}, streak: 0 },
+      { id: nextId++, name: newName.trim(), iconKey: newIconKey, color: newColor, completions: {}, streak: 0 },
     ]);
     setNewName("");
-    setNewEmoji("💧");
+    setNewIconKey("droplets");
     setNewColor(COLORS[0]);
     setShowAdd(false);
   };
@@ -130,7 +157,7 @@ export function HabitsPage() {
         </div>
         <div className="rounded-2xl p-5" style={{ background: currentTheme.colors.surface, boxShadow: `0 2px 16px ${currentTheme.colors.primary}15` }}>
           <div className="flex items-center gap-2 mb-2">
-            <Flame className="w-5 h-5 text-orange-500" />
+            <Flame className="w-5 h-5" style={{ color: currentTheme.colors.accent }} />
             <p className="text-sm" style={{ color: currentTheme.colors.textMuted }}>Melhor Sequência</p>
           </div>
           <p className="text-3xl font-bold" style={{ color: currentTheme.colors.text }}>{bestStreak}</p>
@@ -138,7 +165,7 @@ export function HabitsPage() {
         </div>
         <div className="rounded-2xl p-5" style={{ background: currentTheme.colors.surface, boxShadow: `0 2px 16px ${currentTheme.colors.primary}15` }}>
           <div className="flex items-center gap-2 mb-2">
-            <Trophy className="w-5 h-5 text-yellow-500" />
+            <Trophy className="w-5 h-5" style={{ color: currentTheme.colors.accent }} />
             <p className="text-sm" style={{ color: currentTheme.colors.textMuted }}>Taxa Hoje</p>
           </div>
           <p className="text-3xl font-bold" style={{ color: currentTheme.colors.text }}>{completionRate}%</p>
@@ -179,47 +206,52 @@ export function HabitsPage() {
           <div />
         </div>
 
-        {habits.map((habit) => (
-          <div
-            key={habit.id}
-            className="grid border-b last:border-0 hover:bg-black/5 transition-all"
-            style={{ gridTemplateColumns: "1fr repeat(7, 48px) 64px 40px", borderColor: currentTheme.colors.primary + "10" }}
-          >
-            <div className="px-5 py-3 flex items-center gap-3">
-              <span className="text-xl">{habit.emoji}</span>
-              <span className="text-sm font-medium" style={{ color: currentTheme.colors.text }}>{habit.name}</span>
-            </div>
-            {days.map((d) => {
-              const key = d.toISOString().split("T")[0];
-              const done = habit.completions[key];
-              return (
-                <div key={key} className="flex items-center justify-center py-3">
-                  <button
-                    onClick={() => toggle(habit.id, key)}
-                    className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
-                    style={{
-                      background: done ? habit.color : currentTheme.colors.primaryLight,
-                      border: `2px solid ${done ? habit.color : "transparent"}`,
-                    }}
-                  >
-                    {done && <Check className="w-4 h-4 text-white" />}
-                  </button>
+        {habits.map((habit) => {
+          const HabitIcon = HABIT_ICON_MAP[habit.iconKey];
+          return (
+            <div
+              key={habit.id}
+              className="grid border-b last:border-0 hover:bg-black/5 transition-all"
+              style={{ gridTemplateColumns: "1fr repeat(7, 48px) 64px 40px", borderColor: currentTheme.colors.primary + "10" }}
+            >
+              <div className="px-5 py-3 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: habit.color + "20" }}>
+                  <HabitIcon className="w-4 h-4" style={{ color: habit.color }} />
                 </div>
-              );
-            })}
-            <div className="flex items-center justify-center py-3 gap-1">
-              {habit.streak > 0 && <Flame className="w-3.5 h-3.5 text-orange-500" />}
-              <span className="text-sm font-semibold" style={{ color: habit.streak > 0 ? "#F97316" : currentTheme.colors.textMuted }}>
-                {habit.streak}
-              </span>
+                <span className="text-sm font-medium" style={{ color: currentTheme.colors.text }}>{habit.name}</span>
+              </div>
+              {days.map((d) => {
+                const key = d.toISOString().split("T")[0];
+                const done = habit.completions[key];
+                return (
+                  <div key={key} className="flex items-center justify-center py-3">
+                    <button
+                      onClick={() => toggle(habit.id, key)}
+                      className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                      style={{
+                        background: done ? habit.color : currentTheme.colors.primaryLight,
+                        border: `2px solid ${done ? habit.color : "transparent"}`,
+                      }}
+                    >
+                      {done && <Check className="w-4 h-4 text-white" />}
+                    </button>
+                  </div>
+                );
+              })}
+              <div className="flex items-center justify-center py-3 gap-1">
+                {habit.streak > 0 && <Flame className="w-3.5 h-3.5" style={{ color: currentTheme.colors.accent }} />}
+                <span className="text-sm font-semibold" style={{ color: habit.streak > 0 ? currentTheme.colors.accent : currentTheme.colors.textMuted }}>
+                  {habit.streak}
+                </span>
+              </div>
+              <div className="flex items-center justify-center py-3">
+                <button onClick={() => deleteHabit(habit.id)} className="opacity-40 hover:opacity-100 transition-all">
+                  <Trash2 className="w-4 h-4 text-red-400" />
+                </button>
+              </div>
             </div>
-            <div className="flex items-center justify-center py-3">
-              <button onClick={() => deleteHabit(habit.id)} className="opacity-40 hover:opacity-100 transition-all">
-                <Trash2 className="w-4 h-4 text-red-400" />
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Add Habit Modal */}
@@ -242,18 +274,24 @@ export function HabitsPage() {
               style={{ background: currentTheme.colors.primaryLight, color: currentTheme.colors.text }}
             />
 
-            <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>Emoji</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>Ícone</label>
             <div className="flex flex-wrap gap-2 mb-4">
-              {EMOJIS.map((e) => (
-                <button
-                  key={e}
-                  onClick={() => setNewEmoji(e)}
-                  className="w-10 h-10 rounded-xl text-xl flex items-center justify-center transition-all hover:scale-110"
-                  style={{ background: newEmoji === e ? currentTheme.colors.primary + "30" : currentTheme.colors.primaryLight, border: newEmoji === e ? `2px solid ${currentTheme.colors.primary}` : "2px solid transparent" }}
-                >
-                  {e}
-                </button>
-              ))}
+              {HABIT_ICON_KEYS.map((key) => {
+                const Icon = HABIT_ICON_MAP[key];
+                return (
+                  <button
+                    key={key}
+                    onClick={() => setNewIconKey(key)}
+                    className="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                    style={{
+                      background: newIconKey === key ? currentTheme.colors.primary + "30" : currentTheme.colors.primaryLight,
+                      border: newIconKey === key ? `2px solid ${currentTheme.colors.primary}` : "2px solid transparent",
+                    }}
+                  >
+                    <Icon className="w-5 h-5" style={{ color: newIconKey === key ? currentTheme.colors.primary : currentTheme.colors.textMuted }} />
+                  </button>
+                );
+              })}
             </div>
 
             <label className="block text-sm font-medium mb-2" style={{ color: currentTheme.colors.text }}>Cor</label>

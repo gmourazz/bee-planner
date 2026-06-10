@@ -32,7 +32,7 @@ export const updateMyProfile = async (req: Request, res: Response) => {
   const userId = req.user!.id
 
   // Extrai apenas os campos que o usuário tem permissão de alterar
-  const { name, phone, avatar_url, bio } = req.body
+  const { name, phone, avatar_url, bio, birthdate } = req.body
 
   // Monta o objeto de atualização apenas com os campos enviados
   const updates: Record<string, unknown> = {}
@@ -40,6 +40,7 @@ export const updateMyProfile = async (req: Request, res: Response) => {
   if (phone      !== undefined) updates.phone      = phone
   if (avatar_url !== undefined) updates.avatar_url = avatar_url
   if (bio        !== undefined) updates.bio        = bio
+  if (birthdate  !== undefined) updates.birthdate  = birthdate
 
   if (Object.keys(updates).length === 0) {
     return res.status(400).json({ error: 'Nenhum campo para atualizar foi enviado' })

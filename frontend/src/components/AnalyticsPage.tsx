@@ -20,6 +20,8 @@ export function AnalyticsPage() {
   const booksData = [1, 2, 1, 2, 0, 3, 2, 1, 2, 2, 1, 2];
   const habitsData = [75, 80, 78, 85, 82, 88, 90, 87, 92, 89, 91, 94];
 
+  const trendBadge = { background: currentTheme.colors.primaryLight, color: currentTheme.colors.primaryDark };
+
   return (
     <div className="flex-1 overflow-auto p-6" style={{ background: currentTheme.colors.background }}>
       {/* Header */}
@@ -75,7 +77,7 @@ export function AnalyticsPage() {
               <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: currentTheme.colors.primaryLight }}>
                 <CheckCircle className="w-6 h-6" style={{ color: currentTheme.colors.primary }} />
               </div>
-              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#D1FAE5] text-[#047857]">
+              <div className="flex items-center gap-1 px-2 py-1 rounded-lg" style={trendBadge}>
                 <TrendingUp className="w-3 h-3" />
                 <span className="text-[11px] font-semibold">+12%</span>
               </div>
@@ -90,10 +92,10 @@ export function AnalyticsPage() {
             style={{ background: currentTheme.colors.surface, boxShadow: `0 2px 16px ${currentTheme.colors.primary}15` }}
           >
             <div className="flex items-start justify-between mb-3">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-[#DCFCE7]">
-                <Zap className="w-6 h-6 text-[#10B981]" />
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: currentTheme.colors.primaryLight }}>
+                <Zap className="w-6 h-6" style={{ color: currentTheme.colors.accent }} />
               </div>
-              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#D1FAE5] text-[#047857]">
+              <div className="flex items-center gap-1 px-2 py-1 rounded-lg" style={trendBadge}>
                 <TrendingUp className="w-3 h-3" />
                 <span className="text-[11px] font-semibold">+8%</span>
               </div>
@@ -108,10 +110,10 @@ export function AnalyticsPage() {
             style={{ background: currentTheme.colors.surface, boxShadow: `0 2px 16px ${currentTheme.colors.primary}15` }}
           >
             <div className="flex items-start justify-between mb-3">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-[#E9D5FF]">
-                <BookOpen className="w-6 h-6 text-[#A855F7]" />
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: currentTheme.colors.primaryLight }}>
+                <BookOpen className="w-6 h-6" style={{ color: currentTheme.colors.primaryDark }} />
               </div>
-              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#D1FAE5] text-[#047857]">
+              <div className="flex items-center gap-1 px-2 py-1 rounded-lg" style={trendBadge}>
                 <TrendingUp className="w-3 h-3" />
                 <span className="text-[11px] font-semibold">+15%</span>
               </div>
@@ -126,10 +128,10 @@ export function AnalyticsPage() {
             style={{ background: currentTheme.colors.surface, boxShadow: `0 2px 16px ${currentTheme.colors.primary}15` }}
           >
             <div className="flex items-start justify-between mb-3">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-[#FEF3C7]">
-                <Award className="w-6 h-6 text-[#F59E0B]" />
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: currentTheme.colors.primaryLight }}>
+                <Award className="w-6 h-6" style={{ color: currentTheme.colors.textMuted }} />
               </div>
-              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#D1FAE5] text-[#047857]">
+              <div className="flex items-center gap-1 px-2 py-1 rounded-lg" style={trendBadge}>
                 <TrendingUp className="w-3 h-3" />
                 <span className="text-[11px] font-semibold">+20%</span>
               </div>
@@ -193,13 +195,13 @@ export function AnalyticsPage() {
                   className="w-full rounded-t-lg transition-all hover:opacity-80 cursor-pointer"
                   style={{
                     height: value > 0 ? `${(value / Math.max(...booksData)) * 100}%` : "4px",
-                    background: idx === selectedMonth ? "#A855F7" : "#E9D5FF",
+                    background: idx === selectedMonth ? currentTheme.colors.primaryDark : currentTheme.colors.primaryLight,
                     minHeight: "8px",
                   }}
                 />
                 <span
                   className={`text-[11px] ${idx === selectedMonth ? 'font-semibold' : 'font-normal'}`}
-                  style={{ color: idx === selectedMonth ? "#A855F7" : currentTheme.colors.textMuted }}
+                  style={{ color: idx === selectedMonth ? currentTheme.colors.primaryDark : currentTheme.colors.textMuted }}
                 >
                   {months[idx]}
                 </span>
@@ -226,12 +228,12 @@ export function AnalyticsPage() {
                   className="w-full rounded-t-lg transition-all hover:opacity-80 cursor-pointer"
                   style={{
                     height: `${value}%`,
-                    background: idx === selectedMonth ? "#10B981" : "#D1FAE5",
+                    background: idx === selectedMonth ? currentTheme.colors.accent : currentTheme.colors.primaryLight,
                   }}
                 />
                 <span
                   className={`text-[11px] ${idx === selectedMonth ? 'font-semibold' : 'font-normal'}`}
-                  style={{ color: idx === selectedMonth ? "#10B981" : currentTheme.colors.textMuted }}
+                  style={{ color: idx === selectedMonth ? currentTheme.colors.accent : currentTheme.colors.textMuted }}
                 >
                   {months[idx]}
                 </span>
@@ -254,9 +256,9 @@ export function AnalyticsPage() {
           <div className="space-y-6">
             {[
               { label: "Ler 24 livros", progress: 33, current: "8/24", trackBg: currentTheme.colors.primaryLight, barColor: currentTheme.colors.primary, iconColor: currentTheme.colors.primary },
-              { label: "5 cursos online", progress: 100, current: "5/5", trackBg: "#D1FAE5", barColor: "#10B981", iconColor: "#10B981" },
-              { label: "90% hábitos diários", progress: 87, current: "87%", trackBg: "#FEF3C7", barColor: "#F59E0B", iconColor: "#F59E0B" },
-              { label: "Concluir TCC", progress: 65, current: "65%", trackBg: "#EDE9FE", barColor: "#8B5CF6", iconColor: "#8B5CF6" },
+              { label: "5 cursos online", progress: 100, current: "5/5", trackBg: currentTheme.colors.primaryLight, barColor: currentTheme.colors.primaryDark, iconColor: currentTheme.colors.primaryDark },
+              { label: "90% hábitos diários", progress: 87, current: "87%", trackBg: currentTheme.colors.primaryLight, barColor: currentTheme.colors.accent, iconColor: currentTheme.colors.accent },
+              { label: "Concluir TCC", progress: 65, current: "65%", trackBg: currentTheme.colors.primaryLight, barColor: currentTheme.colors.textMuted, iconColor: currentTheme.colors.textMuted },
             ].map((goal) => (
               <div key={goal.label}>
                 <div className="flex items-center justify-between mb-2">
