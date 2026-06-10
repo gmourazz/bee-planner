@@ -1,3 +1,5 @@
+export type BookStatus = 'lido' | 'lendo' | 'quero_ler'
+
 export interface Book {
   id: string
   title: string
@@ -11,4 +13,5 @@ export interface Book {
   startedAt: string | null
   finishedAt: string | null
   isManga: boolean
+  status: BookStatus
 }

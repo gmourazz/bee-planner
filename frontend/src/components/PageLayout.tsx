@@ -3,7 +3,7 @@ import { useTheme } from "../contexts/ThemeContext";
 import {
   BarChart3, CalendarDays, Zap, MapPin, BookOpen,
   GraduationCap, StickyNote, Award, DollarSign,
-  Heart, Target, User, Settings, type LucideIcon,
+  Heart, Target, User, Settings, Clapperboard, type LucideIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -18,7 +18,8 @@ const ROUTE_MAP: Record<string, RouteInfo> = {
   "/habitos":       { label: "Hábitos",             Icon: Zap },
   "/datas":         { label: "Datas Importantes",   Icon: MapPin },
   "/notas":         { label: "Notas",               Icon: StickyNote },
-  "/livros":        { label: "Livros Lidos",        Icon: BookOpen },
+  "/livros":        { label: "Livros",               Icon: BookOpen },
+  "/series":        { label: "Séries & Filmes",      Icon: Clapperboard },
   "/cursos":        { label: "Cursos",              Icon: Award },
   "/universitario": { label: "Universitário",       Icon: GraduationCap },
   "/financas":      { label: "Finanças",            Icon: DollarSign },

@@ -7,6 +7,7 @@ import { useState, useEffect, useRef } from "react";
 import { useTheme } from "../contexts/ThemeContext";
 import { useAuth } from "../contexts/AuthContext";
 import { fetchMyProfile, updateMyProfile, uploadAvatar } from "../services/profile";
+import { useToast } from "../components/Toast";
 
 const THEME_ICONS: Record<string, React.ReactNode> = {
   'bee':           <Hexagon      size={22} strokeWidth={1.5} />,
@@ -26,6 +27,7 @@ const THEME_ICONS: Record<string, React.ReactNode> = {
 export function ProfilePage() {
   const { currentTheme, themes, setTheme } = useTheme();
   const { user } = useAuth();
+  const { toast } = useToast();
   const [editing, setEditing]       = useState(false);
   const [saving, setSaving]         = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
@@ -110,6 +112,17 @@ export function ProfilePage() {
         role:      updated.role      ?? "user",
       });
       setEditing(false);
+      toast("Perfil salvo!", "Suas informações foram atualizadas.", "success");
+    } catch (err: any) {
+      const msg = err?.message ?? "Erro desconhecido";
+      const isMissingCol = msg.toLowerCase().includes("column") || msg.toLowerCase().includes("birthdate");
+      toast(
+        "Erro ao salvar",
+        isMissingCol
+          ? 'A coluna "birthdate" não existe no banco. Rode: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS birthdate DATE;'
+          : msg,
+        "error",
+      );
     } finally {
       setSaving(false);
     }

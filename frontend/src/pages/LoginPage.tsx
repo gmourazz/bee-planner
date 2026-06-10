@@ -116,7 +116,7 @@ export function LoginPage({ onLogin }: LoginProps) {
     clear();
     setLoading(true);
     try {
-      const temSessao = await signUp(rEmail, rPass, rName, rPhone || undefined);
+      const temSessao = await signUp(rEmail, rPass, rName, rPhone || undefined, rBirth || undefined);
       if (!temSessao) {
         // signUp não retornou sessão — tenta signIn como fallback
         await signIn(rEmail, rPass);

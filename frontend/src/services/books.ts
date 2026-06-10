@@ -1,6 +1,6 @@
 import { supabase } from '../lib/supabase'
 import { compressImage } from '../utils/image.utils'
-import type { Book } from '../types/book.types'
+import type { Book, BookStatus } from '../types/book.types'
 
 function mapBook(row: any): Book {
   return {
@@ -16,6 +16,7 @@ function mapBook(row: any): Book {
     startedAt:  row.started_at ?? null,
     finishedAt: row.finished_at ?? null,
     isManga:    row.is_manga ?? false,
+    status:     (row.status as BookStatus) ?? 'lido',
   }
 }
 
@@ -61,6 +62,7 @@ export async function createBook(
   startedAt?: string | null,
   finishedAt?: string | null,
   isManga?: boolean,
+  status?: BookStatus,
 ): Promise<Book> {
   const { data: { session } } = await supabase.auth.getSession()
   if (!session?.user) throw new Error('Não autenticado')
@@ -78,6 +80,7 @@ export async function createBook(
       started_at:  startedAt  || null,
       finished_at: finishedAt || null,
       is_manga:    isManga ?? false,
+      status:      status ?? 'lido',
     })
     .select()
     .single()
@@ -95,7 +98,7 @@ export async function createBook(
 
 export async function updateBook(
   id: string,
-  changes: Partial<Pick<Book, 'title' | 'author' | 'rating' | 'review' | 'genre' | 'colorIdx' | 'startedAt' | 'finishedAt' | 'isManga'>>,
+  changes: Partial<Pick<Book, 'title' | 'author' | 'rating' | 'review' | 'genre' | 'colorIdx' | 'startedAt' | 'finishedAt' | 'isManga' | 'status'>>,
   coverFile?: File | null,
 ): Promise<Book> {
   const updates: Record<string, unknown> = {}
@@ -108,6 +111,7 @@ export async function updateBook(
   if (changes.startedAt  !== undefined) updates.started_at   = changes.startedAt  || null
   if (changes.finishedAt !== undefined) updates.finished_at  = changes.finishedAt || null
   if (changes.isManga    !== undefined) updates.is_manga     = changes.isManga
+  if (changes.status     !== undefined) updates.status       = changes.status
 
   const { data, error } = await supabase
     .from('books')

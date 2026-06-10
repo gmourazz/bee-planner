@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { fetchBooks, createBook, updateBook, deleteBook } from '../services/books'
-import type { Book } from '../types/book.types'
+import type { Book, BookStatus } from '../types/book.types'
 import { useToast } from '../components/Toast'
 
 const formInicial = {
@@ -12,6 +12,7 @@ const formInicial = {
   startedAt: '' as string,
   finishedAt: '' as string,
   isManga: false,
+  status: 'lido' as BookStatus,
 }
 
 export function useBooks() {
@@ -51,9 +52,9 @@ export function useBooks() {
     setForm(f => ({ ...f, coverFile: file, coverPreview: preview }))
   }
 
-  const openAdd = () => {
+  const openAdd = (statusInicial?: BookStatus) => {
     setEditingBook(null)
-    setForm(formInicial)
+    setForm({ ...formInicial, status: statusInicial ?? 'lido' })
     setShowAdd(true)
   }
 
@@ -74,12 +75,16 @@ export function useBooks() {
       startedAt:  book.startedAt  ?? '',
       finishedAt: book.finishedAt ?? '',
       isManga:    book.isManga ?? false,
+      status:     book.status ?? 'lido',
     })
     setShowAdd(true)
   }
 
   const addBook = async () => {
-    if (!form.title.trim() || !form.author.trim() || saving) return
+    const tituloOk = form.title.trim()
+    // Para "quero ler", autor é opcional
+    const autorOk  = form.status === 'quero_ler' ? true : form.author.trim()
+    if (!tituloOk || !autorOk || saving) return
     setSaving(true)
     try {
       const coverFile = form.coverMode === 'photo' ? form.coverFile : null
@@ -87,13 +92,13 @@ export function useBooks() {
       if (editingBook) {
         const atualizado = await updateBook(
           editingBook.id,
-          { title: form.title, author: form.author, rating: form.rating, review: form.review, genre: form.genres, colorIdx: form.colorIdx, startedAt: form.startedAt || null, finishedAt: form.finishedAt || null, isManga: form.isManga },
+          { title: form.title, author: form.author, rating: form.rating, review: form.review, genre: form.genres, colorIdx: form.colorIdx, startedAt: form.startedAt || null, finishedAt: form.finishedAt || null, isManga: form.isManga, status: form.status },
           coverFile,
         )
         setBooks(prev => prev.map(b => b.id === atualizado.id ? atualizado : b))
         toast('Livro atualizado!', `"${atualizado.title}" foi salvo.`)
       } else {
-        const livro = await createBook(form.title, form.author, form.rating, form.review, form.genres, form.colorIdx, coverFile, form.startedAt || null, form.finishedAt || null, form.isManga)
+        const livro = await createBook(form.title, form.author, form.rating, form.review, form.genres, form.colorIdx, coverFile, form.startedAt || null, form.finishedAt || null, form.isManga, form.status)
         setBooks(prev => [livro, ...prev])
         toast('Livro adicionado!', `"${livro.title}" foi registrado com sucesso.`)
       }

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm list *)",
+      "Bash(Get-ChildItem \"c:\\\\Users\\\\geovannamoura\\\\Documents\\\\Geovanna\\\\bee-planner\\\\frontend\" -Filter \".env*\" -Force)",
+      "Bash(Select-Object Name, FullName)",
+      "Bash(node -e \"require\\('dotenv'\\).config\\(\\); console.log\\(process.env.VITE_SUPABASE_URL\\)\")",
+      "Bash(node_modules\\\\.bin\\\\tsc --noEmit)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(dir /s \"c:\\\\Users\\\\geovannamoura\\\\Documents\\\\ctributaria\\\\ctributaria\\\\src\")",
+      "Bash(node -e \"const l = require\\('lucide-react'\\); console.log\\('Clapperboard:', !!l.Clapperboard, 'Popcorn:', !!l.Popcorn, 'Projector:', !!l.Projector, 'Ticket:', !!l.Ticket\\)\")"
+    ]
+  }
+}

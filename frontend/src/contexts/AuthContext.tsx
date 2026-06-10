@@ -7,7 +7,7 @@ interface AuthContextType {
   session: Session | null
   loading: boolean
   signIn: (email: string, password: string) => Promise<void>
-  signUp: (email: string, password: string, name: string, phone?: string) => Promise<boolean>
+  signUp: (email: string, password: string, name: string, phone?: string, birthdate?: string) => Promise<boolean>
   signOut: () => Promise<void>
 }
 
@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error
   }
 
-  const signUp = async (email: string, password: string, name: string, phone?: string): Promise<boolean> => {
+  const signUp = async (email: string, password: string, name: string, phone?: string, birthdate?: string): Promise<boolean> => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -49,6 +49,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (data.session) {
       setSession(data.session)
       setUser(data.session.user)
+      // Salva birthdate na tabela profiles se informado
+      if (birthdate) {
+        await supabase.from('profiles').update({ birthdate }).eq('id', data.session.user.id)
+      }
       return true
     }
     return false

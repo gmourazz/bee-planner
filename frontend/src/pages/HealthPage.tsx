@@ -70,7 +70,10 @@ const EXERCISES = [
   { name: "Ciclismo",  duration: 50 },
 ];
 
-const WEEK_DAYS = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+const DAY_NAMES = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+function keyToDayName(key: string) {
+  return DAY_NAMES[new Date(key + 'T12:00:00').getDay()];
+}
 
 export function HealthPage() {
   const { currentTheme } = useTheme();
@@ -360,7 +363,7 @@ export function HealthPage() {
               return (
                 <div key={k} className="flex-1 flex flex-col items-center gap-1">
                   <div className="w-full rounded-t-md transition-all" style={{ height: `${(h / 12) * 100}%`, background: h >= 7 ? currentTheme.colors.primary : currentTheme.colors.accent, minHeight: h > 0 ? "4px" : "0" }} />
-                  <span className="text-[9px]" style={{ color: currentTheme.colors.textMuted }}>{WEEK_DAYS[i]}</span>
+                  <span className="text-[9px]" style={{ color: currentTheme.colors.textMuted }}>{keyToDayName(k)}</span>
                 </div>
               )
             })}
@@ -399,7 +402,7 @@ export function HealthPage() {
               return (
                 <div key={k} className="flex-1 flex flex-col items-center gap-1">
                   <div className="w-full rounded-t-md transition-all" style={{ height: `${(val / 5) * 100}%`, background: moodBarColor(val), minHeight: val > 0 ? "4px" : "0" }} />
-                  <span className="text-[9px]" style={{ color: currentTheme.colors.textMuted }}>{WEEK_DAYS[i]}</span>
+                  <span className="text-[9px]" style={{ color: currentTheme.colors.textMuted }}>{keyToDayName(k)}</span>
                 </div>
               )
             })}

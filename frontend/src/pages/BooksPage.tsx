@@ -1,10 +1,11 @@
-import { PlusCircle, Star, BookOpen, X, Check, Trash2, Loader2, Target, ImageIcon, Palette, LayoutGrid, List, Pencil, ChevronDown, ChevronUp, CalendarDays, EyeOff, Crop, ZoomIn, Search } from 'lucide-react'
+import { PlusCircle, Star, BookOpen, X, Check, Trash2, Loader2, Target, ImageIcon, Palette, LayoutGrid, List, Pencil, ChevronDown, ChevronUp, CalendarDays, EyeOff, Crop, ZoomIn, Search, Clock, Bookmark, Plus, CheckCircle, TrendingUp, Award, User, BarChart2, Library } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { DatePickerInput } from '../components/DatePickerInput'
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import Cropper from 'react-easy-crop'
 import { useTheme } from '../contexts/ThemeContext'
 import { useBooks } from '../hooks/useBooks'
-import type { Book } from '../types/book.types'
+import type { Book, BookStatus } from '../types/book.types'
 import { getCroppedImage } from '../utils/crop.utils'
 import type { PixelCrop } from '../utils/crop.utils'
 
@@ -18,36 +19,74 @@ const GRADIENTS = [
 ]
 
 const GENEROS = [
-  'Autoajuda', 'Ficção', 'Filosofia', 'Produtividade',
-  'Psicologia', 'Romance', 'Biografia', 'Ciência',
-  'História', 'Tecnologia', 'Universitário', 'Negócios',
+  'Autoajuda', 'Biografia', 'Ciência', 'Fantasia',
+  'Ficção', 'Filosofia', 'História', 'HQ',
+  'Negócios', 'Policial', 'Produtividade', 'Psicologia',
+  'Romance', 'Saúde', 'Suspense', 'Tecnologia',
+  'Terror', 'Universitário',
 ]
+
+const STATUS_CONFIG: Record<BookStatus, { label: string; color: string; bg: string; Icon: LucideIcon }> = {
+  lido:      { label: 'Lido',      color: '#059669', bg: '#d1fae5', Icon: CheckCircle },
+  lendo:     { label: 'Lendo',     color: '#d97706', bg: '#fef3c7', Icon: Clock       },
+  quero_ler: { label: 'Quero ler', color: '#7c3aed', bg: '#ede9fe', Icon: Bookmark    },
+}
 
 const MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
 
-function GeneroSelect({ selected, onChange, theme }: {
+function GeneroSelect({ selected, onChange, theme, extraGeneros = [], onAddGenero }: {
   selected: string[]
   onChange: (v: string[]) => void
   theme: any
+  extraGeneros?: string[]
+  onAddGenero?: (g: string) => void
 }) {
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
+  const [open,        setOpen]        = useState(false)
+  const [novoGenero,  setNovoGenero]  = useState('')
+  const [adicionando, setAdicionando] = useState(false)
+  const [dropPos,     setDropPos]     = useState<React.CSSProperties>({})
+  const wrapRef = useRef<HTMLDivElement>(null)
+  const btnRef  = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
-    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }
+    const h = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
+        setOpen(false); setAdicionando(false)
+      }
+    }
     document.addEventListener('mousedown', h)
     return () => document.removeEventListener('mousedown', h)
   }, [])
+
+  const handleOpen = () => {
+    if (!open && btnRef.current) {
+      const r = btnRef.current.getBoundingClientRect()
+      setDropPos({ top: r.bottom + 4, left: r.left, width: r.width })
+    }
+    setOpen(o => !o)
+  }
 
   const toggle = (g: string) => {
     onChange(selected.includes(g) ? selected.filter(s => s !== g) : [...selected, g])
   }
 
+  const confirmarNovoGenero = () => {
+    const nome = novoGenero.trim()
+    if (!nome) return
+    onAddGenero?.(nome)
+    onChange([...selected, nome])
+    setNovoGenero('')
+    setAdicionando(false)
+  }
+
+  const todosGeneros = [...GENEROS, ...extraGeneros]
+
   return (
-    <div ref={ref} className="relative w-full">
+    <div ref={wrapRef} className="relative w-full">
       <button
+        ref={btnRef}
         type="button"
-        onClick={() => setOpen(o => !o)}
+        onClick={handleOpen}
         className="w-full flex items-center justify-between px-3 py-3 rounded-2xl text-sm text-left transition-all"
         style={{ background: theme.colors.primaryLight, color: theme.colors.text }}
       >
@@ -62,11 +101,11 @@ function GeneroSelect({ selected, onChange, theme }: {
 
       {open && (
         <div
-          className="absolute z-30 w-full mt-1 rounded-2xl shadow-xl overflow-hidden"
-          style={{ background: theme.colors.surface, border: `1px solid ${theme.colors.primary}20` }}
+          className="fixed z-[9999] rounded-2xl shadow-xl overflow-hidden"
+          style={{ ...dropPos, minWidth: 220, background: theme.colors.surface, border: `1px solid ${theme.colors.primary}20` }}
         >
           <div className="overflow-y-auto" style={{ maxHeight: '200px' }}>
-            {GENEROS.map(g => {
+            {todosGeneros.map(g => {
               const sel = selected.includes(g)
               return (
                 <button
@@ -82,6 +121,34 @@ function GeneroSelect({ selected, onChange, theme }: {
               )
             })}
           </div>
+          {onAddGenero && (
+            <div className="border-t px-3 py-2" style={{ borderColor: `${theme.colors.primary}15`, background: theme.colors.surface }}>
+              {adicionando ? (
+                <div className="flex gap-2 items-center">
+                  <input
+                    autoFocus
+                    value={novoGenero}
+                    onChange={e => setNovoGenero(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') confirmarNovoGenero(); if (e.key === 'Escape') setAdicionando(false) }}
+                    placeholder="Nome do gênero"
+                    className="flex-1 px-2 py-1 rounded-lg text-xs outline-none"
+                    style={{ background: theme.colors.primaryLight, color: theme.colors.text }}
+                  />
+                  <button type="button" onClick={confirmarNovoGenero}
+                    className="px-3 py-1 rounded-lg text-xs font-bold flex-shrink-0"
+                    style={{ background: theme.colors.primary, color: '#fff' }}>OK</button>
+                  <button type="button" onClick={() => setAdicionando(false)}
+                    className="text-xs flex-shrink-0" style={{ color: theme.colors.textMuted }}>✕</button>
+                </div>
+              ) : (
+                <button type="button" onClick={() => setAdicionando(true)}
+                  className="flex items-center gap-1.5 text-xs font-semibold w-full py-1 hover:opacity-70 transition-all"
+                  style={{ color: theme.colors.primary }}>
+                  <Plus className="w-3.5 h-3.5" /> Adicionar gênero
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -124,16 +191,34 @@ function bookDias(book: Book): number | null {
   ))
 }
 
+// Para "lendo": conta de startedAt até hoje; para "lido": usa bookDias
+function diasAtivos(book: Book): number {
+  if (book.status === 'lendo' && book.startedAt) {
+    return Math.max(0, Math.round((Date.now() - new Date(book.startedAt + 'T00:00').getTime()) / 86400000))
+  }
+  return bookDias(book) ?? 0
+}
+
 function BookCard({ book, theme, gradients, onDelete, onEdit, onSelect }: {
   book: Book; theme: any; gradients: string[]
   onDelete: (id: string) => void
   onEdit: (book: Book) => void
   onSelect: (book: Book) => void
 }) {
-  const lidoEm = book.startedAt
-    ? new Date(book.startedAt + 'T00:00').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
-    : new Date(book.created_at).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
   const registradoEm = new Date(book.created_at).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', year: 'numeric' })
+  const fmt = (d: string) => new Date(d + 'T00:00').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+
+  // Label e data dependem do status
+  const dateInfo: { label: string; value: string } | null =
+    book.status === 'quero_ler'
+      ? null
+      : book.status === 'lendo'
+        ? book.startedAt
+          ? { label: 'Iniciado', value: fmt(book.startedAt) }
+          : null
+        : book.startedAt
+          ? { label: 'Iniciado', value: fmt(book.startedAt) }
+          : null
   const dias = bookDias(book)
 
   return (
@@ -151,18 +236,31 @@ function BookCard({ book, theme, gradients, onDelete, onEdit, onSelect }: {
         </button>
       </div>
 
-      {/* Badge de dias no canto superior esquerdo */}
-      {dias !== null && (
-        <div className="absolute top-3 left-3 z-10 px-2 py-0.5 rounded-full text-[10px] font-bold text-white"
-          style={{ background: 'rgba(0,0,0,0.45)' }}>
-          Lido em {dias} dia{dias !== 1 ? 's' : ''}
-        </div>
-      )}
+      {/* Badges: status + dias lado a lado */}
+      <div className="absolute top-2 left-2 right-2 z-10 flex flex-row flex-wrap gap-1">
+        {(() => {
+          const cfg = STATUS_CONFIG[book.status]
+          const Icon = cfg.Icon
+          return (
+            <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold flex items-center gap-0.5"
+              style={{ background: cfg.bg, color: cfg.color }}>
+              <Icon className="w-2.5 h-2.5 flex-shrink-0" />
+              {cfg.label}
+            </span>
+          )
+        })()}
+        {dias !== null && (
+          <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold text-white"
+            style={{ background: 'rgba(0,0,0,0.45)' }}>
+            {dias}d
+          </span>
+        )}
+      </div>
 
       <BookCover
         book={book}
         gradients={gradients}
-        className="h-40 w-full"
+        className="h-32 w-full"
         onClick={book.coverUrl ? e => { e.stopPropagation(); window.open(book.coverUrl!, '_blank') } : undefined}
       />
 
@@ -180,7 +278,11 @@ function BookCard({ book, theme, gradients, onDelete, onEdit, onSelect }: {
           </div>
         )}
         <div className="mt-2 flex flex-col gap-0.5">
-          <p className="text-[10px] capitalize" style={{ color: theme.colors.textMuted }}>Iniciado: {lidoEm}</p>
+          {dateInfo && (
+            <p className="text-[10px] capitalize" style={{ color: theme.colors.textMuted }}>
+              {dateInfo.label}: {dateInfo.value}
+            </p>
+          )}
           <p className="text-[10px]" style={{ color: theme.colors.textMuted }}>Reg.: {registradoEm}</p>
         </div>
       </div>
@@ -194,9 +296,8 @@ function BookListItem({ book, theme, gradients, onDelete, onEdit, onSelect }: {
   onEdit: (book: Book) => void
   onSelect: (book: Book) => void
 }) {
-  const lidoEm = book.startedAt
-    ? new Date(book.startedAt + 'T00:00').toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })
-    : new Date(book.created_at).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })
+  const fmt = (d: string) => new Date(d + 'T00:00').toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })
+  const dateLabel = book.status !== 'quero_ler' && book.startedAt ? fmt(book.startedAt) : null
   const dias = bookDias(book)
 
   return (
@@ -228,9 +329,15 @@ function BookListItem({ book, theme, gradients, onDelete, onEdit, onSelect }: {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 mt-2">
+        <div className="flex items-center gap-3 mt-2 flex-wrap">
           <StarRow rating={book.rating} theme={theme} />
-          <span className="text-[11px] capitalize" style={{ color: theme.colors.textMuted }}>{lidoEm}</span>
+          {dateLabel && <span className="text-[11px] capitalize" style={{ color: theme.colors.textMuted }}>{dateLabel}</span>}
+          {book.status !== 'lido' && (
+            <span className="text-[11px] px-2 py-0.5 rounded-full font-semibold"
+              style={{ background: STATUS_CONFIG[book.status].bg, color: STATUS_CONFIG[book.status].color }}>
+              {STATUS_CONFIG[book.status].label}
+            </span>
+          )}
           {dias !== null && (
             <span className="text-[11px] px-2 py-0.5 rounded-full font-semibold"
               style={{ background: theme.colors.primaryLight, color: theme.colors.primaryDark }}>
@@ -399,19 +506,39 @@ function BookDetailModal({ book, theme, gradients, onClose, onEdit, onDelete }: 
   )
 }
 
-function GeneroFiltroSelect({ value, onChange, theme }: {
+function GeneroFiltroSelect({ value, onChange, theme, extraGeneros = [], onAddGenero }: {
   value: string
   onChange: (v: string) => void
   theme: any
+  extraGeneros?: string[]
+  onAddGenero?: (g: string) => void
 }) {
-  const [open, setOpen] = useState(false)
+  const [open,        setOpen]        = useState(false)
+  const [adicionando, setAdicionando] = useState(false)
+  const [novoGenero,  setNovoGenero]  = useState('')
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }
+    const h = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false); setAdicionando(false)
+      }
+    }
     document.addEventListener('mousedown', h)
     return () => document.removeEventListener('mousedown', h)
   }, [])
+
+  const confirmar = () => {
+    const nome = novoGenero.trim()
+    if (!nome) return
+    onAddGenero?.(nome)
+    onChange(nome)
+    setNovoGenero('')
+    setAdicionando(false)
+    setOpen(false)
+  }
+
+  const todosGeneros = [...GENEROS, ...extraGeneros]
 
   return (
     <div ref={ref} className="relative flex-shrink-0">
@@ -424,7 +551,7 @@ function GeneroFiltroSelect({ value, onChange, theme }: {
 
       {open && (
         <div className="absolute z-30 top-full mt-1 rounded-2xl shadow-xl overflow-hidden"
-          style={{ background: theme.colors.surface, border: `1px solid ${theme.colors.primary}20`, minWidth: '140px' }}>
+          style={{ background: theme.colors.surface, border: `1px solid ${theme.colors.primary}20`, minWidth: '180px' }}>
           <div className="overflow-y-auto" style={{ maxHeight: '220px' }}>
             <button type="button" onClick={() => { onChange(''); setOpen(false) }}
               className="w-full flex items-center justify-between px-4 py-2.5 text-xs transition-all hover:opacity-80 text-left"
@@ -432,7 +559,7 @@ function GeneroFiltroSelect({ value, onChange, theme }: {
               <span>Todos</span>
               {!value && <Check className="w-3 h-3 flex-shrink-0" style={{ color: theme.colors.primary }} />}
             </button>
-            {GENEROS.map(g => (
+            {todosGeneros.map(g => (
               <button key={g} type="button" onClick={() => { onChange(g); setOpen(false) }}
                 className="w-full flex items-center justify-between px-4 py-2.5 text-xs transition-all hover:opacity-80 text-left"
                 style={{ background: value === g ? theme.colors.primaryLight : 'transparent', color: theme.colors.text }}>
@@ -441,8 +568,401 @@ function GeneroFiltroSelect({ value, onChange, theme }: {
               </button>
             ))}
           </div>
+          {onAddGenero && (
+            <div className="border-t px-3 py-2" style={{ borderColor: `${theme.colors.primary}15`, background: theme.colors.surface }}>
+              {adicionando ? (
+                <div className="flex gap-2 items-center">
+                  <input
+                    autoFocus
+                    value={novoGenero}
+                    onChange={e => setNovoGenero(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') confirmar(); if (e.key === 'Escape') setAdicionando(false) }}
+                    placeholder="Nome do gênero"
+                    className="flex-1 px-2 py-1 rounded-lg text-xs outline-none"
+                    style={{ background: theme.colors.primaryLight, color: theme.colors.text }}
+                  />
+                  <button type="button" onClick={confirmar}
+                    className="px-3 py-1 rounded-lg text-xs font-bold flex-shrink-0"
+                    style={{ background: theme.colors.primary, color: '#fff' }}>OK</button>
+                  <button type="button" onClick={() => setAdicionando(false)}
+                    className="text-xs flex-shrink-0" style={{ color: theme.colors.textMuted }}>✕</button>
+                </div>
+              ) : (
+                <button type="button" onClick={() => setAdicionando(true)}
+                  className="flex items-center gap-1.5 text-xs font-semibold w-full py-1 hover:opacity-70 transition-all"
+                  style={{ color: theme.colors.primary }}>
+                  <Plus className="w-3.5 h-3.5" /> Novo gênero
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────
+// Helpers de estatísticas (usados no perfil)
+// ─────────────────────────────────────────────
+function topN<T extends string>(map: Record<T, number>, n: number): { key: T; count: number }[] {
+  return (Object.entries(map) as [T, number][])
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, n)
+    .map(([key, count]) => ({ key, count }))
+}
+
+// ─────────────────────────────────────────────
+// Componente: Perfil do Leitor
+// ─────────────────────────────────────────────
+function ReaderProfile({ books, theme }: { books: Book[]; theme: any }) {
+  const lidos = books.filter(b => b.status === 'lido')
+  const lendo = books.filter(b => b.status === 'lendo')
+  const queroLer = books.filter(b => b.status === 'quero_ler')
+  const total = books.length
+
+  // ── autores ──────────────────────────────────
+  const autorCount: Record<string, number> = {}
+  const autorRatingSum: Record<string, number> = {}
+  lidos.forEach(b => {
+    if (!b.author) return
+    autorCount[b.author] = (autorCount[b.author] || 0) + 1
+    autorRatingSum[b.author] = (autorRatingSum[b.author] || 0) + b.rating
+  })
+  const topAutores = topN(autorCount, 5)
+
+  // ── gêneros ──────────────────────────────────
+  const genreCount: Record<string, number> = {}
+  lidos.forEach(b => b.genre.forEach(g => { genreCount[g] = (genreCount[g] || 0) + 1 }))
+  const topGeneros = topN(genreCount, 6)
+  const maxGenero = topGeneros[0]?.count || 1
+
+  // ── avaliação média ───────────────────────────
+  const comRating = lidos.filter(b => b.rating > 0)
+  const avgRating = comRating.length > 0
+    ? comRating.reduce((s, b) => s + b.rating, 0) / comRating.length
+    : 0
+
+  // ── ritmo de leitura ─────────────────────────
+  const comDias = lidos.filter(b => bookDias(b) !== null)
+  const mediaDias = comDias.length > 0
+    ? Math.round(comDias.reduce((s, b) => s + (bookDias(b) ?? 0), 0) / comDias.length)
+    : null
+
+  // ── histórico anual ──────────────────────────
+  const anoAtual = new Date().getFullYear()
+  const anosHist = [anoAtual - 2, anoAtual - 1, anoAtual]
+  const porAno = anosHist.map(ano => ({
+    ano,
+    count: lidos.filter(b => new Date((b.startedAt || b.created_at) + (b.startedAt ? 'T00:00' : '')).getFullYear() === ano).length,
+  }))
+  const maxAno = Math.max(...porAno.map(a => a.count), 1)
+
+  // ── distribuição por mês (ano atual) ─────────
+  const porMes = Array.from({ length: 12 }, (_, i) => ({
+    mes: MESES[i],
+    count: lidos.filter(b => {
+      const d = new Date((b.startedAt || b.created_at) + (b.startedAt ? 'T00:00' : ''))
+      return d.getFullYear() === anoAtual && d.getMonth() === i
+    }).length,
+  }))
+  const maxMesHist = Math.max(...porMes.map(m => m.count), 1)
+
+  // ── avaliação por estrela ─────────────────────
+  const starDist = [5, 4, 3, 2, 1].map(s => ({
+    star: s,
+    count: comRating.filter(b => b.rating === s).length,
+  }))
+  const maxStar = Math.max(...starDist.map(s => s.count), 1)
+
+  // ── livros x mangás ───────────────────────────
+  const totalMangas = lidos.filter(b => b.isManga).length
+  const totalLivros = lidos.length - totalMangas
+  const mangaPct = lidos.length > 0 ? (totalMangas / lidos.length) * 100 : 0
+  // donut
+  const R = 32, CIRC = 2 * Math.PI * R
+  const mangaArc = CIRC * (mangaPct / 100)
+
+  if (total === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 gap-4">
+        <div className="w-16 h-16 rounded-2xl flex items-center justify-center"
+          style={{ background: theme.colors.primaryLight }}>
+          <BarChart2 className="w-8 h-8" style={{ color: theme.colors.primary }} />
+        </div>
+        <p className="text-sm font-semibold" style={{ color: theme.colors.textMuted }}>
+          Registre seus primeiros livros para ver seu perfil de leitor!
+        </p>
+      </div>
+    )
+  }
+
+  const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
+    <div className={`rounded-2xl p-5 ${className}`}
+      style={{ background: theme.colors.surface, boxShadow: `0 2px 16px ${theme.colors.primary}0A` }}>
+      {children}
+    </div>
+  )
+
+  const SectionTitle = ({ icon: Icon, label }: { icon: LucideIcon; label: string }) => (
+    <div className="flex items-center gap-2 mb-4">
+      <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+        style={{ background: theme.colors.primaryLight }}>
+        <Icon className="w-3.5 h-3.5" style={{ color: theme.colors.primary }} />
+      </div>
+      <p className="font-bold text-sm" style={{ color: theme.colors.text }}>{label}</p>
+    </div>
+  )
+
+  return (
+    <div className="flex flex-col gap-5">
+
+      {/* ── Linha 1: cards de resumo ── */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[
+          { icon: CheckCircle, label: 'Lidos', value: lidos.length, color: '#059669', bg: '#d1fae5' },
+          { icon: Clock,       label: 'Lendo agora', value: lendo.length, color: '#d97706', bg: '#fef3c7' },
+          { icon: Bookmark,    label: 'Quero ler', value: queroLer.length, color: '#7c3aed', bg: '#ede9fe' },
+          { icon: Library,     label: 'Total na estante', value: total, color: theme.colors.primary, bg: theme.colors.primaryLight },
+        ].map(({ icon: Icon, label, value, color, bg }) => (
+          <div key={label} className="rounded-2xl p-4 flex items-center gap-3"
+            style={{ background: theme.colors.surface, boxShadow: `0 2px 16px ${theme.colors.primary}0A` }}>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ background: bg }}>
+              <Icon className="w-5 h-5" style={{ color }} />
+            </div>
+            <div>
+              <p className="text-2xl font-black leading-none" style={{ color: theme.colors.text }}>{value}</p>
+              <p className="text-[11px] mt-0.5" style={{ color: theme.colors.textMuted }}>{label}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Linha 2: autor favorito + avaliação + ritmo ── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+        {/* Autores mais lidos */}
+        <Card className="md:col-span-2">
+          <SectionTitle icon={User} label="Autores mais lidos" />
+          {topAutores.length === 0 ? (
+            <p className="text-xs" style={{ color: theme.colors.textMuted }}>Nenhum autor registrado ainda.</p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {topAutores.map(({ key: autor, count }, idx) => {
+                const media = autorRatingSum[autor] > 0 && autorCount[autor] > 0
+                  ? (autorRatingSum[autor] / autorCount[autor]).toFixed(1)
+                  : null
+                const pct = Math.round((count / (topAutores[0]?.count || 1)) * 100)
+                return (
+                  <div key={autor} className="flex items-center gap-3">
+                    {/* rank */}
+                    <span className="text-[11px] font-black w-4 text-center flex-shrink-0"
+                      style={{ color: idx === 0 ? '#f59e0b' : theme.colors.textMuted }}>
+                      {idx === 0 ? '★' : `#${idx + 1}`}
+                    </span>
+                    {/* nome */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-xs font-semibold truncate" style={{ color: theme.colors.text }}>{autor}</p>
+                        <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                          {media && (
+                            <span className="text-[10px] font-bold" style={{ color: '#f59e0b' }}>★ {media}</span>
+                          )}
+                          <span className="text-[10px] font-bold" style={{ color: theme.colors.primary }}>
+                            {count} livro{count !== 1 ? 's' : ''}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: theme.colors.primaryLight }}>
+                        <div className="h-full rounded-full transition-all duration-700"
+                          style={{ width: `${pct}%`, background: idx === 0 ? '#f59e0b' : theme.colors.primary }} />
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </Card>
+
+        {/* Avaliação + ritmo */}
+        <div className="flex flex-col gap-4">
+          {/* Avaliação média */}
+          <Card>
+            <SectionTitle icon={Star} label="Avaliação média" />
+            <div className="flex items-end gap-3 mb-3">
+              <span className="text-4xl font-black leading-none" style={{ color: theme.colors.text }}>
+                {avgRating > 0 ? avgRating.toFixed(1) : '—'}
+              </span>
+              <div className="flex mb-1 gap-0.5">
+                {[1,2,3,4,5].map(s => (
+                  <Star key={s} className="w-4 h-4"
+                    style={{ color: s <= Math.round(avgRating) ? '#f59e0b' : theme.colors.primaryLight,
+                             fill: s <= Math.round(avgRating) ? '#f59e0b' : theme.colors.primaryLight }} />
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              {starDist.map(({ star, count: c }) => (
+                <div key={star} className="flex items-center gap-2">
+                  <span className="text-[10px] w-3 text-right flex-shrink-0" style={{ color: theme.colors.textMuted }}>{star}</span>
+                  <Star className="w-2.5 h-2.5 flex-shrink-0" style={{ color: '#f59e0b', fill: '#f59e0b' }} />
+                  <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: theme.colors.primaryLight }}>
+                    <div className="h-full rounded-full transition-all duration-700"
+                      style={{ width: `${maxStar > 0 ? Math.round((c / maxStar) * 100) : 0}%`, background: '#f59e0b' }} />
+                  </div>
+                  <span className="text-[10px] w-3 flex-shrink-0" style={{ color: theme.colors.textMuted }}>{c}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Ritmo de leitura */}
+          <Card>
+            <SectionTitle icon={TrendingUp} label="Ritmo médio" />
+            <div className="flex items-end gap-2">
+              <span className="text-3xl font-black leading-none" style={{ color: theme.colors.text }}>
+                {mediaDias ?? '—'}
+              </span>
+              {mediaDias !== null && (
+                <span className="text-sm mb-0.5" style={{ color: theme.colors.textMuted }}>dias/livro</span>
+              )}
+            </div>
+            <p className="text-[11px] mt-1" style={{ color: theme.colors.textMuted }}>
+              {comDias.length > 0
+                ? `Calculado com base em ${comDias.length} leitura${comDias.length !== 1 ? 's' : ''} com datas`
+                : 'Adicione datas de início e fim para calcular'}
+            </p>
+          </Card>
+        </div>
+      </div>
+
+      {/* ── Linha 3: gêneros + donut + histórico ── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+        {/* Top gêneros */}
+        <Card className="md:col-span-1">
+          <SectionTitle icon={Award} label="Gêneros favoritos" />
+          {topGeneros.length === 0 ? (
+            <p className="text-xs" style={{ color: theme.colors.textMuted }}>Nenhum gênero registrado ainda.</p>
+          ) : (
+            <div className="flex flex-col gap-2.5">
+              {topGeneros.map(({ key: genero, count }) => {
+                const pct = Math.round((count / maxGenero) * 100)
+                return (
+                  <div key={genero}>
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-[11px] font-semibold truncate" style={{ color: theme.colors.text }}>{genero}</p>
+                      <span className="text-[10px] ml-2 flex-shrink-0" style={{ color: theme.colors.primary }}>
+                        {count}×
+                      </span>
+                    </div>
+                    <div className="h-1.5 rounded-full overflow-hidden" style={{ background: theme.colors.primaryLight }}>
+                      <div className="h-full rounded-full transition-all duration-700"
+                        style={{ width: `${pct}%`, background: theme.colors.primary }} />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </Card>
+
+        {/* Livros vs Mangás */}
+        <Card className="flex flex-col items-center justify-center">
+          <SectionTitle icon={BookOpen} label="Livros vs Mangás" />
+          <div className="flex flex-col items-center gap-4">
+            <svg width="88" height="88" viewBox="0 0 88 88">
+              <circle cx="44" cy="44" r={R} fill="none" stroke={theme.colors.primaryLight} strokeWidth="10" />
+              {lidos.length > 0 && (
+                <>
+                  <circle cx="44" cy="44" r={R} fill="none"
+                    stroke={theme.colors.primary} strokeWidth="10"
+                    strokeDasharray={`${CIRC - mangaArc} ${mangaArc}`}
+                    strokeLinecap="round" transform="rotate(-90 44 44)" />
+                  {mangaArc > 0 && (
+                    <circle cx="44" cy="44" r={R} fill="none"
+                      stroke="#a855f7" strokeWidth="10"
+                      strokeDasharray={`${mangaArc} ${CIRC - mangaArc}`}
+                      strokeDashoffset={CIRC - (CIRC - mangaArc)}
+                      strokeLinecap="round" transform="rotate(-90 44 44)" />
+                  )}
+                </>
+              )}
+              <text x="44" y="40" textAnchor="middle" fontSize="11" fontWeight="700" fill={theme.colors.text}>
+                {lidos.length}
+              </text>
+              <text x="44" y="53" textAnchor="middle" fontSize="8" fill={theme.colors.textMuted}>lidos</text>
+            </svg>
+            <div className="flex gap-4">
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: theme.colors.primary }} />
+                <span className="text-[11px]" style={{ color: theme.colors.textMuted }}>Livros <strong style={{ color: theme.colors.text }}>{totalLivros}</strong></span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: '#a855f7' }} />
+                <span className="text-[11px]" style={{ color: theme.colors.textMuted }}>Mangás <strong style={{ color: theme.colors.text }}>{totalMangas}</strong></span>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Histórico anual + mensal */}
+        <Card>
+          <SectionTitle icon={BarChart2} label="Histórico de leituras" />
+          {/* Por ano — barras com círculo branco */}
+          <div className="flex items-end gap-3 mb-4" style={{ height: 72 }}>
+            {porAno.map(({ ano, count }) => {
+              const h = count > 0 ? Math.max(40, Math.round((count / maxAno) * 60)) : 6
+              const ativo = ano === anoAtual
+              return (
+                <div key={ano} className="flex-1 flex flex-col items-center gap-1">
+                  <div
+                    className="w-full rounded-t-xl transition-all duration-500 flex items-start justify-center pt-1.5 flex-shrink-0"
+                    style={{ height: h, background: ativo ? theme.colors.primary : theme.colors.primaryLight }}
+                  >
+                    {count > 0 && (
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ background: 'rgba(255,255,255,0.9)', minWidth: 24 }}>
+                        <span className="text-[10px] font-black leading-none"
+                          style={{ color: ativo ? theme.colors.primary : theme.colors.primaryDark }}>
+                          {count}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-[10px]" style={{ color: theme.colors.textMuted }}>{ano}</span>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Por mês (ano atual) */}
+          <p className="text-[10px] font-semibold mb-1.5" style={{ color: theme.colors.textMuted }}>
+            Mês a mês — {anoAtual}
+          </p>
+          <div className="flex items-end gap-0.5 h-10">
+            {porMes.map(({ mes, count }) => {
+              const h = count > 0 ? Math.max(8, Math.round((count / maxMesHist) * 32)) : 3
+              return (
+                <div key={mes} className="flex-1 flex flex-col items-center gap-0.5">
+                  <div className="w-full rounded-sm transition-all duration-500 relative"
+                    style={{ height: h, background: count > 0 ? theme.colors.primary : theme.colors.primaryLight + '60' }}>
+                    {count > 0 && (
+                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full flex items-center justify-center"
+                        style={{ background: 'rgba(255,255,255,0.9)', border: `1px solid ${theme.colors.primary}30` }}>
+                        <span className="text-[8px] font-black" style={{ color: theme.colors.primary }}>{count}</span>
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-[7px]" style={{ color: theme.colors.textMuted }}>{mes[0]}</span>
+                </div>
+              )
+            })}
+          </div>
+        </Card>
+      </div>
     </div>
   )
 }
@@ -460,6 +980,7 @@ export function BooksPage() {
     addBook, removeBook,
   } = useBooks()
 
+  const [aba,                setAba]                = useState<'biblioteca' | 'perfil'>('biblioteca')
   const [hoverRating,        setHoverRating]        = useState(0)
   const [editandoMeta,       setEditandoMeta]       = useState(false)
   const [metaInput,          setMetaInput]          = useState(String(metaAnual))
@@ -473,9 +994,20 @@ export function BooksPage() {
   const [croppedAreaPixels,  setCroppedAreaPixels]  = useState<PixelCrop | null>(null)
   const [croppingDone,       setCroppingDone]       = useState(false)
   const [filtroTipo,         setFiltroTipo]         = useState<'todos' | 'livros' | 'mangas'>('todos')
+  const [filtroStatus,       setFiltroStatus]       = useState<'todos' | BookStatus>('todos')
   const [filtroAutor,        setFiltroAutor]        = useState('')
   const [filtroGeneroSel,    setFiltroGeneroSel]    = useState('')
+  const [customGeneros,      setCustomGeneros]      = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem('bp_custom_genres') ?? '[]') } catch { return [] }
+  })
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const addCustomGenero = (nome: string) => {
+    if (GENEROS.includes(nome) || customGeneros.includes(nome)) return
+    const updated = [...customGeneros, nome]
+    setCustomGeneros(updated)
+    localStorage.setItem('bp_custom_genres', JSON.stringify(updated))
+  }
 
   // Ano/mês do livro usa startedAt quando disponível, senão created_at
   const getBookDate = (b: Book) => new Date((b.startedAt || b.finishedAt || b.created_at) + (b.startedAt || b.finishedAt ? 'T00:00' : ''))
@@ -515,21 +1047,29 @@ export function BooksPage() {
   const anosAntigos  = Array.from({ length: ANO_BASE - 2015 }, (_, i) => ANO_BASE - 1 - i)
   const anosVisiveis = verMaisAnos ? [...anosRecentes, ...anosAntigos] : anosDefault
 
-  const livrosFiltrados = books.filter(b => {
-    const anoOk    = getBookYear(b) === anoFiltro
-    const mesOk    = filtroMes === null || getBookMonth(b) === filtroMes
+  // Separa por status — "lendo" e "quero ler" ficam em seções próprias
+  const livrosEmAndamento = books.filter(b => b.status === 'lendo')
+  const livrosQueroLer    = books.filter(b => b.status === 'quero_ler')
+  const livrosLidos       = books.filter(b => b.status === 'lido')
+
+  // Base muda com o filtro de status; lendo/quero_ler ignoram filtro de ano/mês
+  const baseParaFiltro = filtroStatus === 'todos' ? livrosLidos : books.filter(b => b.status === filtroStatus)
+  const livrosFiltrados = baseParaFiltro.filter(b => {
+    const skipDate = filtroStatus === 'lendo' || filtroStatus === 'quero_ler'
+    const anoOk    = skipDate || getBookYear(b) === anoFiltro
+    const mesOk    = skipDate || filtroMes === null || getBookMonth(b) === filtroMes
     const tipoOk   = filtroTipo === 'todos' || (filtroTipo === 'mangas' ? b.isManga : !b.isManga)
-    const autorOk  = !filtroAutor.trim() || b.author.toLowerCase().includes(filtroAutor.toLowerCase())
+    const autorOk  = !filtroAutor.trim() || b.author.toLowerCase().includes(filtroAutor.toLowerCase()) || b.title.toLowerCase().includes(filtroAutor.toLowerCase())
     const generoOk = !filtroGeneroSel || b.genre.includes(filtroGeneroSel)
     return anoOk && mesOk && tipoOk && autorOk && generoOk
   })
 
   const livrosPorMes = MESES.map((_, i) =>
-    books.filter(b => getBookMonth(b) === i && getBookYear(b) === anoFiltro).length
+    livrosLidos.filter(b => getBookMonth(b) === i && getBookYear(b) === anoFiltro).length
   )
 
-  // Métricas sempre do ano atual
-  const booksAnoAtual = books.filter(b => getBookYear(b) === anoAtual)
+  // Métricas sempre do ano atual (só livros lidos)
+  const booksAnoAtual = livrosLidos.filter(b => getBookYear(b) === anoAtual)
   const totalAnoAtual = booksAnoAtual.length
   const progresso     = Math.min(100, Math.round((totalAnoAtual / metaAnual) * 100))
   const avgRating = booksAnoAtual.length > 0
@@ -550,7 +1090,8 @@ export function BooksPage() {
   const genreCount: Record<string, number> = {}
   booksAnoAtual.forEach(b => b.genre.forEach(g => { genreCount[g] = (genreCount[g] || 0) + 1 }))
   const generoFav   = Object.entries(genreCount).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—'
-  const totalDias   = booksAnoAtual.reduce((s, b) => s + (bookDias(b) ?? 0), 0)
+  const lendoAnoAtual = livrosEmAndamento.filter(b => getBookYear(b) === anoAtual)
+  const totalDias   = [...booksAnoAtual, ...lendoAnoAtual].reduce((s, b) => s + diasAtivos(b), 0)
   const totalMangas = booksAnoAtual.filter(b => b.isManga).length
   const totalLivros = booksAnoAtual.length - totalMangas
   const maxMes      = Math.max(...livrosPorMes, 1)
@@ -637,6 +1178,115 @@ export function BooksPage() {
           </div>
         </div>
 
+        {/* ── Abas ── */}
+        <div className="flex gap-1 rounded-2xl p-1" style={{ background: currentTheme.colors.surface, boxShadow: `0 2px 16px ${currentTheme.colors.primary}0A` }}>
+          {([
+            { key: 'biblioteca', label: 'Biblioteca', Icon: Library },
+            { key: 'perfil',     label: 'Perfil do Leitor', Icon: BarChart2 },
+          ] as const).map(({ key, label, Icon }) => (
+            <button
+              key={key}
+              onClick={() => setAba(key)}
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all"
+              style={{
+                background: aba === key
+                  ? `linear-gradient(135deg, ${currentTheme.colors.primaryDark} 0%, ${currentTheme.colors.primary} 100%)`
+                  : 'transparent',
+                color: aba === key ? '#fff' : currentTheme.colors.textMuted,
+                boxShadow: aba === key ? `0 4px 12px ${currentTheme.colors.primary}40` : 'none',
+              }}
+            >
+              <Icon className="w-4 h-4" />
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* ── Aba: Perfil do Leitor ── */}
+        {aba === 'perfil' && (
+          <ReaderProfile books={books} theme={currentTheme} />
+        )}
+
+        {/* ── Aba: Biblioteca (conteúdo principal) ── */}
+        {aba === 'biblioteca' && (<>
+
+        {/* ── Em andamento ── */}
+        {filtroStatus === 'todos' && livrosEmAndamento.length > 0 && (
+          <div className="rounded-2xl p-5" style={{ background: currentTheme.colors.surface, boxShadow: `0 2px 16px ${currentTheme.colors.primary}0A` }}>
+            <div className="flex items-center gap-2 mb-4">
+              <Clock className="w-4 h-4" style={{ color: STATUS_CONFIG.lendo.color }} />
+              <span className="font-bold text-sm" style={{ color: currentTheme.colors.text }}>Em andamento</span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold"
+                style={{ background: STATUS_CONFIG.lendo.bg, color: STATUS_CONFIG.lendo.color }}>
+                {livrosEmAndamento.length}
+              </span>
+              <button onClick={() => openAdd('lendo')} className="ml-auto flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold transition-all hover:opacity-80"
+                style={{ background: STATUS_CONFIG.lendo.bg, color: STATUS_CONFIG.lendo.color }}>
+                <Plus className="w-3 h-3" /> Adicionar
+              </button>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-1" style={{ scrollbarWidth: 'thin' }}>
+              {livrosEmAndamento.map(book => (
+                <div key={book.id} className="flex-shrink-0 w-32">
+                  <BookCard book={book} theme={currentTheme} gradients={GRADIENTS}
+                    onDelete={handleDelete} onEdit={handleOpenEdit} onSelect={setSelectedBook} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Quero ler ── */}
+        {filtroStatus === 'todos' && livrosQueroLer.length > 0 && (
+          <div className="rounded-2xl p-5" style={{ background: currentTheme.colors.surface, boxShadow: `0 2px 16px ${currentTheme.colors.primary}0A` }}>
+            <div className="flex items-center gap-2 mb-4">
+              <Bookmark className="w-4 h-4" style={{ color: STATUS_CONFIG.quero_ler.color }} />
+              <span className="font-bold text-sm" style={{ color: currentTheme.colors.text }}>Quero ler</span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold"
+                style={{ background: STATUS_CONFIG.quero_ler.bg, color: STATUS_CONFIG.quero_ler.color }}>
+                {livrosQueroLer.length}
+              </span>
+              <button onClick={() => openAdd('quero_ler')} className="ml-auto flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold transition-all hover:opacity-80"
+                style={{ background: STATUS_CONFIG.quero_ler.bg, color: STATUS_CONFIG.quero_ler.color }}>
+                <Plus className="w-3 h-3" /> Adicionar
+              </button>
+            </div>
+            <div className="flex flex-col gap-2">
+              {livrosQueroLer.map(book => (
+                <div key={book.id}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer hover:opacity-80 transition-all group"
+                  style={{ background: currentTheme.colors.background }}
+                  onClick={() => setSelectedBook(book)}
+                >
+                  <BookOpen className="w-4 h-4 flex-shrink-0" style={{ color: STATUS_CONFIG.quero_ler.color }} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold truncate" style={{ color: currentTheme.colors.text }}>{book.title}</p>
+                    {book.author && <p className="text-xs truncate" style={{ color: currentTheme.colors.textMuted }}>{book.author}</p>}
+                    {book.genre.length > 0 && (
+                      <div className="flex gap-1 mt-1 flex-wrap">
+                        {book.genre.slice(0, 3).map(g => (
+                          <span key={g} className="px-1.5 py-0.5 rounded-full text-[9px]"
+                            style={{ background: currentTheme.colors.primaryLight, color: currentTheme.colors.primaryDark }}>{g}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all flex-shrink-0">
+                    <button onClick={e => { e.stopPropagation(); handleOpenEdit(book) }}
+                      className="p-1.5 rounded-full" style={{ background: currentTheme.colors.primaryLight }}>
+                      <Pencil className="w-3 h-3" style={{ color: currentTheme.colors.primary }} />
+                    </button>
+                    <button onClick={e => { e.stopPropagation(); handleDelete(book.id) }}
+                      className="p-1.5 rounded-full" style={{ background: currentTheme.colors.primaryLight }}>
+                      <Trash2 className="w-3 h-3 text-red-400" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* ── Gráfico de atividade mensal ── */}
         <div className="rounded-2xl p-5" style={{ background: currentTheme.colors.surface, boxShadow: `0 2px 16px ${currentTheme.colors.primary}0A` }}>
           <div className="flex items-center justify-between mb-4">
@@ -708,6 +1358,27 @@ export function BooksPage() {
 
         {/* ── Filtros ── */}
         <div className="rounded-2xl px-4 py-3 flex flex-wrap items-center gap-2" style={{ background: currentTheme.colors.surface, boxShadow: `0 2px 16px ${currentTheme.colors.primary}0A` }}>
+          {/* Status */}
+          <div className="flex gap-1 flex-shrink-0">
+            <button onClick={() => setFiltroStatus('todos')}
+              className="px-3 py-1.5 rounded-full text-xs font-bold transition-all"
+              style={{ background: filtroStatus === 'todos' ? currentTheme.colors.primary : currentTheme.colors.primaryLight, color: filtroStatus === 'todos' ? '#fff' : currentTheme.colors.textMuted }}>
+              Todos
+            </button>
+            {(Object.entries(STATUS_CONFIG) as [BookStatus, typeof STATUS_CONFIG[BookStatus]][]).map(([key, cfg]) => {
+              const Icon = cfg.Icon
+              const ativo = filtroStatus === key
+              return (
+                <button key={key} onClick={() => setFiltroStatus(key)}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold transition-all"
+                  style={{ background: ativo ? cfg.color : currentTheme.colors.primaryLight, color: ativo ? '#fff' : currentTheme.colors.textMuted }}>
+                  <Icon className="w-3 h-3" />
+                  {cfg.label}
+                </button>
+              )
+            })}
+          </div>
+          <div className="w-px h-4 flex-shrink-0" style={{ background: currentTheme.colors.primary + '25' }} />
           {/* Tipo */}
           <div className="flex gap-1 flex-shrink-0">
             {([['todos','Todos'], ['livros','Livros'], ['mangas','Mangás']] as const).map(([val, label]) => (
@@ -719,13 +1390,15 @@ export function BooksPage() {
             ))}
           </div>
           <div className="w-px h-4 flex-shrink-0" style={{ background: currentTheme.colors.primary + '25' }} />
-          {/* Gênero — dropdown customizado */}
+          {/* Gênero */}
           <GeneroFiltroSelect
             value={filtroGeneroSel}
             onChange={setFiltroGeneroSel}
             theme={currentTheme}
+            extraGeneros={customGeneros}
+            onAddGenero={addCustomGenero}
           />
-          {/* Autor */}
+          {/* Buscar */}
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full flex-1 min-w-[160px]"
             style={{ background: currentTheme.colors.primaryLight }}>
             <Search className="w-3.5 h-3.5 flex-shrink-0" style={{ color: currentTheme.colors.textMuted }} />
@@ -734,11 +1407,11 @@ export function BooksPage() {
               className="bg-transparent outline-none text-xs flex-1"
               style={{ color: currentTheme.colors.text }} />
           </div>
-          {(filtroTipo !== 'todos' || filtroGeneroSel || filtroAutor || filtroMes !== null) && (
-            <button onClick={() => { setFiltroTipo('todos'); setFiltroGeneroSel(''); setFiltroAutor(''); setFiltroMes(null) }}
+          {(filtroStatus !== 'todos' || filtroTipo !== 'todos' || filtroGeneroSel || filtroAutor || filtroMes !== null) && (
+            <button onClick={() => { setFiltroStatus('todos'); setFiltroTipo('todos'); setFiltroGeneroSel(''); setFiltroAutor(''); setFiltroMes(null) }}
               className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:opacity-70 flex-shrink-0"
               style={{ background: currentTheme.colors.primaryLight, color: currentTheme.colors.textMuted }}>
-              Limpar filtros
+              Limpar
             </button>
           )}
         </div>
@@ -848,6 +1521,8 @@ export function BooksPage() {
 
           return viewMode === 'grid' ? renderGrid(livrosFiltrados, true) : renderList(livrosFiltrados)
         })()}
+
+        </>)}{/* fecha aba biblioteca */}
         </div>{/* fecha max-w */}
       </div>
 
@@ -911,6 +1586,24 @@ export function BooksPage() {
                 ))}
               </div>
 
+              {/* Toggle Status */}
+              <div className="flex gap-2">
+                {(Object.entries(STATUS_CONFIG) as [BookStatus, typeof STATUS_CONFIG[BookStatus]][]).map(([key, cfg]) => {
+                  const Icon = cfg.Icon
+                  return (
+                    <button key={key} type="button" onClick={() => setForm(f => ({ ...f, status: key }))}
+                      className="flex-1 py-2.5 rounded-2xl text-sm font-bold transition-all flex items-center justify-center gap-1.5"
+                      style={{
+                        background: form.status === key ? cfg.color : currentTheme.colors.primaryLight,
+                        color: form.status === key ? '#fff' : currentTheme.colors.textMuted,
+                      }}>
+                      <Icon className="w-3.5 h-3.5" />
+                      {cfg.label}
+                    </button>
+                  )
+                })}
+              </div>
+
               {/* Título, Autor e Gêneros na mesma linha */}
               <div className="grid grid-cols-3 gap-3">
                 <div>
@@ -931,14 +1624,14 @@ export function BooksPage() {
                 </div>
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: currentTheme.colors.textMuted }}>Gêneros</p>
-                  <GeneroSelect selected={form.genres} onChange={genres => setForm(f => ({ ...f, genres }))} theme={currentTheme} />
+                  <GeneroSelect selected={form.genres} onChange={genres => setForm(f => ({ ...f, genres }))} theme={currentTheme} extraGeneros={customGeneros} onAddGenero={addCustomGenero} />
                 </div>
               </div>
 
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: currentTheme.colors.textMuted }}>Resenha (opcional)</p>
                 <textarea
-                  rows={3}
+                  rows={2}
                   placeholder="O que achou do livro?"
                   value={form.review}
                   onChange={e => setForm(f => ({ ...f, review: e.target.value }))}
@@ -947,13 +1640,13 @@ export function BooksPage() {
                 />
               </div>
 
-              {/* Datas de leitura + dias calculados */}
+              {/* Datas de leitura + dias calculados + avaliação */}
               {(() => {
                 const diasGastos = form.startedAt && form.finishedAt
                   ? Math.max(0, Math.round((new Date(form.finishedAt + 'T00:00').getTime() - new Date(form.startedAt + 'T00:00').getTime()) / 86400000))
                   : null
                 return (
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-4 gap-3">
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: currentTheme.colors.textMuted }}>Iniciada em</p>
                       <DatePickerInput
@@ -983,23 +1676,22 @@ export function BooksPage() {
                           : <span>—</span>}
                       </div>
                     </div>
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: currentTheme.colors.textMuted }}>Avaliação</p>
+                      <div className="flex gap-0.5 pt-0.5">
+                        {[1, 2, 3, 4, 5].map(s => (
+                          <button key={s} type="button" onMouseEnter={() => setHoverRating(s)} onMouseLeave={() => setHoverRating(0)} onClick={() => setForm(f => ({ ...f, rating: s }))}>
+                            <Star className="w-5 h-5 transition-all"
+                              style={{ color: s <= (hoverRating || form.rating) ? currentTheme.colors.primary : currentTheme.colors.primaryLight }}
+                              fill={s <= (hoverRating || form.rating) ? currentTheme.colors.primary : currentTheme.colors.primaryLight}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 )
               })()}
-
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: currentTheme.colors.textMuted }}>Avaliação</p>
-                <div className="flex gap-1">
-                  {[1, 2, 3, 4, 5].map(s => (
-                    <button key={s} onMouseEnter={() => setHoverRating(s)} onMouseLeave={() => setHoverRating(0)} onClick={() => setForm(f => ({ ...f, rating: s }))}>
-                      <Star className="w-7 h-7 transition-all"
-                        style={{ color: s <= (hoverRating || form.rating) ? currentTheme.colors.primary : currentTheme.colors.primaryLight }}
-                        fill={s <= (hoverRating || form.rating) ? currentTheme.colors.primary : currentTheme.colors.primaryLight}
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
 
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: currentTheme.colors.textMuted }}>Capa do livro</p>

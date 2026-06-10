@@ -21,6 +21,7 @@ import { HabitsPage } from "./pages/HabitsPage";
 import { FinancePage } from "./pages/FinancePage";
 import { HealthPage } from "./pages/HealthPage";
 import { GoalsPage } from "./pages/GoalsPage";
+import { SeriesPage } from "./pages/SeriesPage";
 import { ToastProvider } from "./components/Toast";
 import { PageLayout } from "./components/PageLayout";
 
@@ -60,6 +61,7 @@ function AppLayout() {
             <Route path="/universitario" element={<UniversityPage />} />
             <Route path="/financas"      element={<FinancePage />} />
             <Route path="/saude"         element={<HealthPage />} />
+            <Route path="/series"        element={<SeriesPage />} />
             <Route path="/metas"         element={<GoalsPage />} />
             <Route path="/perfil"        element={<ProfilePage />} />
             <Route path="/configuracoes" element={<SettingsPage />} />
