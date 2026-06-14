@@ -3,6 +3,20 @@ import type { Theme } from '../types/theme.types';
 
 export type { Theme };
 
+const DARK_OVERRIDES = {
+  background:   '#080808',
+  surface:      '#141414',
+  text:         '#F2F2F2',
+  textMuted:    '#787878',
+  primaryLight: '#1F1F1F',
+} as const;
+
+const DARK_STORAGE_KEY = 'beeplanner_dark_mode';
+
+function buildDarkTheme(theme: Theme): Theme {
+  return { ...theme, colors: { ...theme.colors, ...DARK_OVERRIDES } };
+}
+
 export const themes: Theme[] = [
   {
     id: 'bee',
@@ -203,6 +217,8 @@ interface ThemeContextType {
   currentTheme: Theme;
   setTheme: (themeId: string) => void;
   themes: Theme[];
+  darkMode: boolean;
+  toggleDarkMode: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -221,26 +237,39 @@ function applyThemeCSSVars(theme: Theme) {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  // Recupera o tema salvo no localStorage, ou usa o padrão
-  const savedId = localStorage.getItem(STORAGE_KEY);
-  const initial = themes.find(t => t.id === savedId) ?? themes[0];
+  const savedId   = localStorage.getItem(STORAGE_KEY);
+  const savedDark = localStorage.getItem(DARK_STORAGE_KEY) === 'true';
+  const initialBase = themes.find(t => t.id === savedId) ?? themes[0];
 
-  const [currentTheme, setCurrentTheme] = useState<Theme>(() => {
-    applyThemeCSSVars(initial);
-    return initial;
+  const [baseTheme, setBaseTheme] = useState<Theme>(() => {
+    const effective = savedDark ? buildDarkTheme(initialBase) : initialBase;
+    applyThemeCSSVars(effective);
+    return initialBase;
   });
+
+  const [darkMode, setDarkMode] = useState<boolean>(savedDark);
+
+  // currentTheme exposto já com dark mode aplicado (usado por todos os componentes)
+  const currentTheme = darkMode ? buildDarkTheme(baseTheme) : baseTheme;
 
   const setTheme = (themeId: string) => {
     const theme = themes.find((t) => t.id === themeId);
     if (theme) {
-      setCurrentTheme(theme);
-      localStorage.setItem(STORAGE_KEY, themeId); // persiste a escolha
-      applyThemeCSSVars(theme);
+      setBaseTheme(theme);
+      localStorage.setItem(STORAGE_KEY, themeId);
+      applyThemeCSSVars(darkMode ? buildDarkTheme(theme) : theme);
     }
   };
 
+  const toggleDarkMode = () => {
+    const next = !darkMode;
+    setDarkMode(next);
+    localStorage.setItem(DARK_STORAGE_KEY, String(next));
+    applyThemeCSSVars(next ? buildDarkTheme(baseTheme) : baseTheme);
+  };
+
   return (
-    <ThemeContext.Provider value={{ currentTheme, setTheme, themes }}>
+    <ThemeContext.Provider value={{ currentTheme, setTheme, themes, darkMode, toggleDarkMode }}>
       {children}
     </ThemeContext.Provider>
   );

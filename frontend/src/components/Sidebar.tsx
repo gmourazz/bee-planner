@@ -1,7 +1,7 @@
 import {
   Home, CalendarDays, Zap, MapPin, BookOpen, GraduationCap,
   StickyNote, Settings, BarChart3, Award, DollarSign, Heart,
-  Target, User, LogOut, ChevronLeft, ChevronRight, ChevronDown, Clapperboard,
+  Target, User, LogOut, ChevronLeft, ChevronRight, ChevronDown, Clapperboard, Moon, Sun,
 } from "lucide-react"
 import { useState } from "react"
 import { NavLink, useLocation } from "react-router-dom"
@@ -75,7 +75,7 @@ const bottomItems: NavItem[] = [
 ]
 
 export function Sidebar({ onLogout }: SidebarProps) {
-  const { currentTheme } = useTheme()
+  const { currentTheme, darkMode, toggleDarkMode } = useTheme()
   const { settings }     = useSettings()
   const location         = useLocation()
   const [collapsed, setCollapsed] = useState(false)
@@ -288,6 +288,33 @@ export function Sidebar({ onLogout }: SidebarProps) {
               </NavLink>
             )
           })}
+
+          {/* Toggle modo escuro */}
+          <button
+            onClick={toggleDarkMode}
+            title={darkMode ? "Modo claro" : "Modo escuro"}
+            className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl transition-all duration-150 hover:opacity-80 w-full"
+            style={{ justifyContent: collapsed ? "center" : "flex-start" }}
+          >
+            <span
+              className="flex items-center justify-center rounded-lg flex-shrink-0"
+              style={{
+                width: 26, height: 26,
+                background: darkMode ? `${currentTheme.colors.primary}22` : `${currentTheme.colors.primary}18`,
+                color: currentTheme.colors.primary,
+              }}
+            >
+              {darkMode
+                ? <Sun style={{ width: 14, height: 14 }} />
+                : <Moon style={{ width: 14, height: 14 }} />
+              }
+            </span>
+            {!collapsed && (
+              <span className="text-sm whitespace-nowrap" style={{ color: currentTheme.colors.text }}>
+                {darkMode ? "Modo claro" : "Modo escuro"}
+              </span>
+            )}
+          </button>
 
           <button
             onClick={onLogout}
