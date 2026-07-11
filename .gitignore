@@ -35,3 +35,4 @@ pnpm-debug.log*
 # Go
 backend-go/backend-go
 backend-go/tmp/
+.DS_Store
