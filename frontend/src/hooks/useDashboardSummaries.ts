@@ -142,8 +142,12 @@ export function useDashboardSummaries(): DashboardSummaries {
 
   // Livros — ano atual
   const anoStr    = String(anoAtual)
-  const livrosAno = livros.filter(l => l.finishedAt && l.finishedAt.startsWith(anoStr)).length
-  const livrosLendo = livros.filter(l => l.startedAt && !l.finishedAt).length
+  const livrosAno = livros.filter(l => {
+    if (l.finishedAt) return l.finishedAt.startsWith(anoStr)
+    if (l.status === 'lido') return l.created_at?.startsWith(anoStr)
+    return false
+  }).length
+  const livrosLendo = livros.filter(l => l.status === 'lendo').length
 
   // Cursos
   const cursosEmAndamento = cursos.filter(c => c.status === 'in-progress' || c.status === 'urgent').length

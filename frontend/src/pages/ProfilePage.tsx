@@ -67,15 +67,26 @@ export function ProfilePage() {
   });
 
   useEffect(() => {
-    fetchMyProfile().then(p => {
+    fetchMyProfile().then(async p => {
+      const phone     = p.phone     ?? user?.user_metadata?.phone ?? "";
+      const birthdate = p.birthdate ?? "";
+
       setProfileData({
         name:      p.name      ?? user?.user_metadata?.name  ?? "",
         email:     p.email     ?? user?.email                ?? "",
-        phone:     p.phone     ?? user?.user_metadata?.phone ?? "",
-        birthdate: p.birthdate ?? "",
+        phone,
+        birthdate,
         role:      p.role      ?? "user",
       });
       if (p.avatar_url) applyAvatar(p.avatar_url);
+
+      // Sincroniza dados do user_metadata → profiles se estiverem faltando
+      const patch: Record<string, string> = {};
+      if (!p.phone && user?.user_metadata?.phone) patch.phone = user.user_metadata.phone;
+      if (!p.birthdate && user?.user_metadata?.birthdate) patch.birthdate = user.user_metadata.birthdate;
+      if (Object.keys(patch).length > 0) {
+        await updateMyProfile(patch).catch(() => {});
+      }
     });
   }, []);
 
@@ -221,16 +232,6 @@ export function ProfilePage() {
                   <h2 style={{ fontSize: 19, fontWeight: 700, color: currentTheme.colors.text, marginBottom: 2 }}>
                     {profileData.name}
                   </h2>
-                </div>
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: 5,
-                  padding: '4px 11px', borderRadius: 99,
-                  background: currentTheme.colors.primaryLight,
-                  fontSize: 11, fontWeight: 600, color: currentTheme.colors.primaryDark,
-                  marginTop: 4,
-                }}>
-                  <ShieldCheck size={12} />
-                  {roleLabel[profileData.role] ?? 'Usuária'}
                 </div>
               </div>
             </div>

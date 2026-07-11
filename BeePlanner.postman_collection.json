@@ -1,0 +1,770 @@
+{
+  "info": {
+    "name": "BeePlanner API",
+    "_postman_id": "beeplanner-api-v1",
+    "description": "Todas as rotas do backend BeePlanner. Configure a variável {{token}} com o JWT da sessão antes de usar rotas autenticadas.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3001/api", "type": "string" },
+    { "key": "token", "value": "SEU_JWT_AQUI", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Cadastrar usuário",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"email\": \"usuario@exemplo.com\",\n  \"password\": \"senha123\",\n  \"name\": \"Geovanna\",\n  \"phone\": \"+5511999999999\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"email\": \"usuario@exemplo.com\",\n  \"password\": \"senha123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/auth/logout", "host": ["{{baseUrl}}"], "path": ["auth", "logout"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "Meu perfil",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/profile/me", "host": ["{{baseUrl}}"], "path": ["profile", "me"] }
+          }
+        },
+        {
+          "name": "Atualizar meu perfil",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/profile/me", "host": ["{{baseUrl}}"], "path": ["profile", "me"] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"name\": \"Geovanna\",\n  \"phone\": \"+5511999999999\",\n  \"bio\": \"Minha bio\",\n  \"birthdate\": \"2000-01-15\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar todos os perfis (admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/profile/all", "host": ["{{baseUrl}}"], "path": ["profile", "all"] }
+          }
+        },
+        {
+          "name": "Alterar role de usuário (admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/profile/:id/role", "host": ["{{baseUrl}}"], "path": ["profile", ":id", "role"], "variable": [{ "key": "id", "value": "UUID_DO_USUARIO" }] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"role\": \"admin\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Habits",
+      "item": [
+        {
+          "name": "Listar hábitos",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/habits", "host": ["{{baseUrl}}"], "path": ["habits"] }
+          }
+        },
+        {
+          "name": "Criar hábito",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/habits", "host": ["{{baseUrl}}"], "path": ["habits"] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"name\": \"Beber água\",\n  \"iconKey\": \"droplets\",\n  \"color\": \"#3B82F6\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Editar hábito",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/habits/:id", "host": ["{{baseUrl}}"], "path": ["habits", ":id"], "variable": [{ "key": "id", "value": "UUID_DO_HABITO" }] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"name\": \"Beber água 2L\",\n  \"color\": \"#10B981\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Deletar hábito",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/habits/:id", "host": ["{{baseUrl}}"], "path": ["habits", ":id"], "variable": [{ "key": "id", "value": "UUID_DO_HABITO" }] }
+          }
+        },
+        {
+          "name": "Toggle conclusão do hábito",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/habits/:id/toggle", "host": ["{{baseUrl}}"], "path": ["habits", ":id", "toggle"], "variable": [{ "key": "id", "value": "UUID_DO_HABITO" }] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"date\": \"2026-06-30\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Goals",
+      "item": [
+        {
+          "name": "Listar metas",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/goals?scope=annual&year=2026",
+              "host": ["{{baseUrl}}"],
+              "path": ["goals"],
+              "query": [
+                { "key": "scope", "value": "annual", "description": "annual ou monthly" },
+                { "key": "year", "value": "2026" },
+                { "key": "month", "value": "", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Criar meta",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/goals", "host": ["{{baseUrl}}"], "path": ["goals"] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"title\": \"Ler 12 livros\",\n  \"description\": \"Um livro por mês\",\n  \"target\": 12,\n  \"current\": 0,\n  \"unit\": \"livros\",\n  \"color\": \"#8B5CF6\",\n  \"category\": \"Leitura\",\n  \"scope\": \"annual\",\n  \"year\": 2026\n}"
+            }
+          }
+        },
+        {
+          "name": "Editar meta",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/goals/:id", "host": ["{{baseUrl}}"], "path": ["goals", ":id"], "variable": [{ "key": "id", "value": "UUID_DA_META" }] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"title\": \"Ler 15 livros\",\n  \"target\": 15\n}"
+            }
+          }
+        },
+        {
+          "name": "Atualizar progresso da meta",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/goals/:id", "host": ["{{baseUrl}}"], "path": ["goals", ":id"], "variable": [{ "key": "id", "value": "UUID_DA_META" }] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"current\": 5\n}"
+            }
+          }
+        },
+        {
+          "name": "Deletar meta",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/goals/:id", "host": ["{{baseUrl}}"], "path": ["goals", ":id"], "variable": [{ "key": "id", "value": "UUID_DA_META" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notes",
+      "item": [
+        {
+          "name": "Listar notas",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/notes", "host": ["{{baseUrl}}"], "path": ["notes"] }
+          }
+        },
+        {
+          "name": "Criar nota",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/notes", "host": ["{{baseUrl}}"], "path": ["notes"] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"title\": \"Minha nota\",\n  \"content\": \"Conteúdo da nota...\",\n  \"category\": \"Pessoal\",\n  \"color\": \"#FCD34D\",\n  \"isPinned\": false\n}"
+            }
+          }
+        },
+        {
+          "name": "Editar nota",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/notes/:id", "host": ["{{baseUrl}}"], "path": ["notes", ":id"], "variable": [{ "key": "id", "value": "UUID_DA_NOTA" }] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"title\": \"Nota atualizada\",\n  \"content\": \"Novo conteúdo\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Deletar nota",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/notes/:id", "host": ["{{baseUrl}}"], "path": ["notes", ":id"], "variable": [{ "key": "id", "value": "UUID_DA_NOTA" }] }
+          }
+        },
+        {
+          "name": "Toggle pin da nota",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/notes/:id/pin", "host": ["{{baseUrl}}"], "path": ["notes", ":id", "pin"], "variable": [{ "key": "id", "value": "UUID_DA_NOTA" }] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"isPinned\": true\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Events",
+      "item": [
+        {
+          "name": "Listar eventos",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/events", "host": ["{{baseUrl}}"], "path": ["events"] }
+          }
+        },
+        {
+          "name": "Criar evento",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/events", "host": ["{{baseUrl}}"], "path": ["events"] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"title\": \"Reunião\",\n  \"date\": \"2026-07-01\",\n  \"type\": \"Trabalho\",\n  \"description\": \"Reunião semanal\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Editar evento",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/events/:id", "host": ["{{baseUrl}}"], "path": ["events", ":id"], "variable": [{ "key": "id", "value": "UUID_DO_EVENTO" }] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"title\": \"Reunião atualizada\",\n  \"date\": \"2026-07-02\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Deletar evento",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/events/:id", "host": ["{{baseUrl}}"], "path": ["events", ":id"], "variable": [{ "key": "id", "value": "UUID_DO_EVENTO" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Books",
+      "item": [
+        {
+          "name": "Listar livros",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/books", "host": ["{{baseUrl}}"], "path": ["books"] }
+          }
+        },
+        {
+          "name": "Criar livro",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/books", "host": ["{{baseUrl}}"], "path": ["books"] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"title\": \"Atomic Habits\",\n  \"author\": \"James Clear\",\n  \"rating\": 5,\n  \"review\": \"Livro incrível!\",\n  \"genres\": [\"Autoajuda\", \"Produtividade\"],\n  \"colorIdx\": 0\n}"
+            }
+          }
+        },
+        {
+          "name": "Deletar livro",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/books/:id", "host": ["{{baseUrl}}"], "path": ["books", ":id"], "variable": [{ "key": "id", "value": "UUID_DO_LIVRO" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Courses",
+      "item": [
+        {
+          "name": "Listar cursos",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/courses", "host": ["{{baseUrl}}"], "path": ["courses"] }
+          }
+        },
+        {
+          "name": "Criar curso",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/courses", "host": ["{{baseUrl}}"], "path": ["courses"] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"title\": \"Go para iniciantes\",\n  \"platform\": \"Udemy\",\n  \"duration\": \"20h\",\n  \"progress\": 0,\n  \"status\": \"in_progress\",\n  \"start_date\": \"2026-06-01\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Editar curso",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/courses/:id", "host": ["{{baseUrl}}"], "path": ["courses", ":id"], "variable": [{ "key": "id", "value": "UUID_DO_CURSO" }] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"progress\": 50,\n  \"status\": \"in_progress\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Deletar curso",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/courses/:id", "host": ["{{baseUrl}}"], "path": ["courses", ":id"], "variable": [{ "key": "id", "value": "UUID_DO_CURSO" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Finance",
+      "item": [
+        {
+          "name": "Listar transações",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/finance", "host": ["{{baseUrl}}"], "path": ["finance"] }
+          }
+        },
+        {
+          "name": "Criar transação",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/finance", "host": ["{{baseUrl}}"], "path": ["finance"] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"description\": \"Salário\",\n  \"amount\": 3500.00,\n  \"type\": \"income\",\n  \"category\": \"Trabalho\",\n  \"date\": \"2026-06-30\",\n  \"recurring\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Editar transação",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/finance/:id", "host": ["{{baseUrl}}"], "path": ["finance", ":id"], "variable": [{ "key": "id", "value": "UUID_DA_TRANSACAO" }] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"amount\": 4000.00,\n  \"description\": \"Salário atualizado\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Deletar transação",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/finance/:id", "host": ["{{baseUrl}}"], "path": ["finance", ":id"], "variable": [{ "key": "id", "value": "UUID_DA_TRANSACAO" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Listar logs de saúde",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/health?since=2026-06-01",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"],
+              "query": [{ "key": "since", "value": "2026-06-01", "description": "Filtrar a partir de (YYYY-MM-DD)" }]
+            }
+          }
+        },
+        {
+          "name": "Criar/atualizar log do dia",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/health/:date", "host": ["{{baseUrl}}"], "path": ["health", ":date"], "variable": [{ "key": "date", "value": "2026-06-30" }] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"water\": 8,\n  \"sleep\": 7.5,\n  \"mood\": 4,\n  \"exercises\": [\"Caminhada\", \"Alongamento\"],\n  \"steps\": 8500\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "University",
+      "item": [
+        {
+          "name": "Listar matérias",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/university/subjects", "host": ["{{baseUrl}}"], "path": ["university", "subjects"] }
+          }
+        },
+        {
+          "name": "Criar matéria",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/university/subjects", "host": ["{{baseUrl}}"], "path": ["university", "subjects"] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"name\": \"Cálculo I\",\n  \"professor\": \"Dr. Silva\",\n  \"credits\": 4,\n  \"semester\": \"2026.1\",\n  \"max_absences\": 15\n}"
+            }
+          }
+        },
+        {
+          "name": "Editar matéria",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/university/subjects/:id", "host": ["{{baseUrl}}"], "path": ["university", "subjects", ":id"], "variable": [{ "key": "id", "value": "UUID_DA_MATERIA" }] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"grade\": 8.5,\n  \"absences\": 2\n}"
+            }
+          }
+        },
+        {
+          "name": "Deletar matéria",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/university/subjects/:id", "host": ["{{baseUrl}}"], "path": ["university", "subjects", ":id"], "variable": [{ "key": "id", "value": "UUID_DA_MATERIA" }] }
+          }
+        },
+        {
+          "name": "Listar grade horária",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/university/schedule", "host": ["{{baseUrl}}"], "path": ["university", "schedule"] }
+          }
+        },
+        {
+          "name": "Criar aula na grade",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/university/schedule", "host": ["{{baseUrl}}"], "path": ["university", "schedule"] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"subject_name\": \"Cálculo I\",\n  \"room\": \"B-204\",\n  \"day_of_week\": 2,\n  \"time_start\": \"08:00\",\n  \"semester\": \"2026.1\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Deletar aula da grade",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/university/schedule/:id", "host": ["{{baseUrl}}"], "path": ["university", "schedule", ":id"], "variable": [{ "key": "id", "value": "UUID_DA_AULA" }] }
+          }
+        },
+        {
+          "name": "Listar provas",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/university/exams", "host": ["{{baseUrl}}"], "path": ["university", "exams"] }
+          }
+        },
+        {
+          "name": "Criar prova",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/university/exams", "host": ["{{baseUrl}}"], "path": ["university", "exams"] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"subject\": \"Cálculo I\",\n  \"exam_date\": \"2026-07-15\",\n  \"type\": \"Prova\",\n  \"description\": \"Conteúdo: Limites e Derivadas\",\n  \"status\": \"pending\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Toggle status da prova",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/university/exams/:id", "host": ["{{baseUrl}}"], "path": ["university", "exams", ":id"], "variable": [{ "key": "id", "value": "UUID_DA_PROVA" }] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"status\": \"done\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Deletar prova",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/university/exams/:id", "host": ["{{baseUrl}}"], "path": ["university", "exams", ":id"], "variable": [{ "key": "id", "value": "UUID_DA_PROVA" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Integrations",
+      "item": [
+        {
+          "name": "Status das integrações",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/integrations/status", "host": ["{{baseUrl}}"], "path": ["integrations", "status"] }
+          }
+        },
+        {
+          "name": "Iniciar conexão com Google Calendar",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/integrations/google/connect", "host": ["{{baseUrl}}"], "path": ["integrations", "google", "connect"] }
+          }
+        },
+        {
+          "name": "Listar eventos do Google Calendar",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/integrations/google/events", "host": ["{{baseUrl}}"], "path": ["integrations", "google", "events"] }
+          }
+        },
+        {
+          "name": "Criar evento no Google Calendar",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/integrations/google/events", "host": ["{{baseUrl}}"], "path": ["integrations", "google", "events"] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"title\": \"Reunião\",\n  \"date\": \"2026-07-01\",\n  \"type\": \"Trabalho\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Desconectar Google Calendar",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/integrations/google", "host": ["{{baseUrl}}"], "path": ["integrations", "google"] }
+          }
+        },
+        {
+          "name": "Iniciar conexão com Outlook Calendar",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/integrations/outlook/connect", "host": ["{{baseUrl}}"], "path": ["integrations", "outlook", "connect"] }
+          }
+        },
+        {
+          "name": "Criar evento no Outlook Calendar",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/integrations/outlook/events", "host": ["{{baseUrl}}"], "path": ["integrations", "outlook", "events"] },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"title\": \"Reunião\",\n  \"date\": \"2026-07-01\",\n  \"type\": \"Trabalho\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Desconectar Outlook",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/integrations/outlook", "host": ["{{baseUrl}}"], "path": ["integrations", "outlook"] }
+          }
+        }
+      ]
+    }
+  ]
+}

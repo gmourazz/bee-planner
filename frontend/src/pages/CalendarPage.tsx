@@ -480,7 +480,7 @@ export function CalendarPage() {
       {integrationMsg && (
         <div
           className="fixed top-5 right-5 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-lg text-white text-sm font-medium"
-          style={{ background: integrationMsg.type === 'success' ? '#10B981' : '#EF4444' }}
+          style={{ background: integrationMsg.type === 'success' ? '#34D399' : '#F87171' }}
         >
           {integrationMsg.type === 'success'
             ? <Check className="w-4 h-4" />
@@ -670,7 +670,7 @@ export function CalendarPage() {
                     <div className="relative">
                       <Icon className="w-5 h-5" style={{ color: active ? color : currentTheme.colors.textMuted }} />
                       {connected && (
-                        <div className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2" style={{ background: '#10B981', borderColor: currentTheme.colors.surface }} />
+                        <div className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2" style={{ background: '#34D399', borderColor: currentTheme.colors.surface }} />
                       )}
                     </div>
                     <span className="text-[10px] font-semibold leading-tight text-center" style={{ color: active ? color : currentTheme.colors.textMuted }}>

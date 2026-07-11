@@ -5,6 +5,7 @@ import {
   fetchUpcomingEvents, fetchDashStats, fetchWeekSummary,
   type DashTask, type DashEvent, type DashStats, type WeekSummary, type TaskCategory,
 } from '../services/dashboard'
+import { createEvent, invalidateEventsCache } from '../services/events'
 import { useAuth } from '../contexts/AuthContext'
 
 export function useDashboard(selectedDate: string, weekDates: string[]) {
@@ -102,5 +103,12 @@ export function useDashboard(selectedDate: string, weekDates: string[]) {
     catch { recarregarSemana() }
   }
 
-  return { tasks, events, stats, weekSummary, loading, addTask, toggleDone, editTask, removeTask }
+  const addEvent = async (title: string, date: string, type: string) => {
+    if (!title.trim() || !date) return
+    const ev = await createEvent(title, date, type)
+    invalidateEventsCache()
+    setEvents(prev => [...prev, { id: ev.id, title: ev.title, date: ev.date, type: ev.type }].sort((a, b) => a.date.localeCompare(b.date)))
+  }
+
+  return { tasks, events, stats, weekSummary, loading, addTask, addEvent, toggleDone, editTask, removeTask }
 }

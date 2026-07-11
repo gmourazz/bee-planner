@@ -26,10 +26,10 @@ export const HABIT_ICON_KEYS: HabitIconKey[] = [
 ]
 
 export const HABIT_COLORS = [
-  "#F472B6",
-  "#A855F7",
-  "#3B82F6",
-  "#10B981",
-  "#F59E0B",
-  "#EF4444",
+  "#F9A8D4",  // rosa
+  "#C4B5FD",  // lilás
+  "#93C5FD",  // azul
+  "#6EE7B7",  // menta
+  "#FCD34D",  // amarelo
+  "#FCA5A5",  // salmão
 ]

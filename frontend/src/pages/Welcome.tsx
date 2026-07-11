@@ -1,6 +1,3 @@
-// src/pages/Welcome.tsx
-// Props: onLoginClick (botão "Entrar") | onGetStarted (botão "Começar grátis")
-
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -14,17 +11,17 @@ import {
 } from 'lucide-react';
 
 interface WelcomeProps {
-  onLoginClick:  () => void; // "Entrar"          → /login
-  onGetStarted:  () => void; // "Começar grátis"  → /login?mode=register
+  onLoginClick:  () => void;
+  onGetStarted:  () => void;
 }
 
 const FEATURES: [React.ReactNode, string, string][] = [
-  [<Home       size={22}/>, 'Início',        'Visão geral do seu dia com resumo de tarefas, hábitos e próximos eventos.'],
-  [<BarChart3  size={22}/>, 'Analytics',     'Gráficos e métricas de produtividade veja seu progresso ao longo do tempo.'],
-  [<CalendarDays size={22}/>, 'Semana',      'Grid visual com todos os dias. Adicione tarefas e defina prioridades com cores.'],
-  [<Zap        size={22}/>, 'Hábitos',       'Rastreie hábitos diários com marcação dos últimos 7 dias e streaks visuais.'],
-  [<MapPin     size={22}/>, 'Datas',         'Aniversários, formaturas e eventos nunca mais esqueça uma data especial.'],
-  [<StickyNote size={22}/>, 'Notas',         'Páginas e pastas para anotar tudo como o Notion, mas mais fofo.'],
+  [<Home       size={22}/>, 'Início',        'Visão geral do seu dia — resumo de hábitos, tarefas e próximos eventos num só lugar.'],
+  [<BarChart3  size={22}/>, 'Analytics',     'Gráficos de produtividade que mostram seu progresso ao longo do tempo.'],
+  [<CalendarDays size={22}/>, 'Semana',      'Grid visual da semana. Adicione tarefas e defina prioridades com cores.'],
+  [<Zap        size={22}/>, 'Hábitos',       'Rastreie hábitos diários com marcação dos últimos 7 dias e streaks.'],
+  [<MapPin     size={22}/>, 'Datas',         'Aniversários, formaturas e eventos — nunca mais esqueça uma data especial.'],
+  [<StickyNote size={22}/>, 'Notas',         'Páginas e pastas para anotar tudo. Como o Notion, mas mais fofo.'],
   [<BookOpen   size={22}/>, 'Livros',        'Registre leituras, avalie e acompanhe seu progresso de leitura.'],
   [<Award      size={22}/>, 'Cursos',        'Organize cursos online, aulas e certificações em um só lugar.'],
   [<GraduationCap size={22}/>, 'Universitário', 'Gerencie matérias, provas, trabalhos e seu cronograma acadêmico.'],
@@ -47,7 +44,7 @@ const APP_THEMES = [
 const STRIP_ITEMS: [React.ReactNode, string][] = [
   [<Sparkles   size={13}/>, '100% gratuito'            ],
   [<Shield     size={13}/>, 'Dados protegidos'         ],
-  [<Palette    size={13}/>, 'Temas únicos de profissão' ],
+  [<Palette    size={13}/>, 'Temas por profissão'      ],
   [<CalendarDays size={13}/>, 'Semana & mês visual'    ],
   [<Sprout     size={13}/>, 'Rastreador de hábitos'    ],
   [<FolderOpen size={13}/>, 'Notas & Pastas'           ],
@@ -56,12 +53,29 @@ const STRIP_ITEMS: [React.ReactNode, string][] = [
   [<TrendingUp size={13}/>, 'Acompanhe seu progresso'  ],
 ];
 
+const BEE_PILLARS = [
+  {
+    emoji: '🐝',
+    title: 'Organização natural',
+    desc: 'Abelhas nunca esquecem uma tarefa. Cada uma sabe exatamente o que fazer, quando fazer e por quê. O BeePlanner te dá essa clareza.',
+  },
+  {
+    emoji: '🍯',
+    title: 'Tudo no lugar certo',
+    desc: 'Numa colmeia, cada célula tem sua função. Aqui, cada módulo é uma célula: hábitos, finanças, estudos, metas — organizados e ao alcance.',
+  },
+  {
+    emoji: '🌸',
+    title: 'Fluxo sem esforço',
+    desc: 'A colmeia funciona em harmonia perfeita — sem atrito, sem caos. O app é bonito e rápido pra que organizar a vida seja prazeroso, não uma tarefa.',
+  },
+];
+
 export default function Welcome({ onLoginClick, onGetStarted }: WelcomeProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const calRef   = useRef<HTMLDivElement>(null);
 
-  // Preenche datas do calendário mock
   useEffect(() => {
     const now = new Date();
     for (let i = 1; i <= 5; i++) {
@@ -74,7 +88,6 @@ export default function Welcome({ onLoginClick, onGetStarted }: WelcomeProps) {
     }
   }, []);
 
-  // Scroll reveal
   useEffect(() => {
     const els = document.querySelectorAll<HTMLElement>('.reveal');
     const obs = new IntersectionObserver(entries => {
@@ -95,38 +108,42 @@ export default function Welcome({ onLoginClick, onGetStarted }: WelcomeProps) {
   }, []);
 
   return (
-    <div style={{ fontFamily: "'Montserrat', sans-serif", background: 'var(--bg)', color: 'var(--text)', overflowX: 'hidden' }}>
+    <div style={{ fontFamily: "'Montserrat', sans-serif", background: 'var(--bg)', color: 'var(--text)', overflowX: 'hidden', paddingTop: 72 }}>
 
       {/* ── NAV ── */}
       <nav style={{
-        position: 'sticky', top: 0, zIndex: 100,
-        height: 66, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
+        height: 72, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '0 60px',
-        backdropFilter: 'blur(20px) saturate(160%)',
-        background: 'rgba(255,248,245,.82)',
-        borderBottom: '1px solid rgba(245,213,220,.55)',
+        backdropFilter: 'blur(24px) saturate(180%)',
+        background: 'rgba(255,248,245,.9)',
+        borderBottom: '1px solid rgba(244,165,184,.2)',
+        boxShadow: '0 1px 24px rgba(244,165,184,.1)',
       }}>
+        {/* Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 24, animation: 'beePulse 4s ease-in-out infinite', display: 'inline-block' }}>🐝</span>
-          <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 22, fontStyle: 'italic', color: 'var(--primary-dark)' }}>
+          <div style={{
+            width: 38, height: 38, borderRadius: 11,
+            background: 'linear-gradient(135deg, #F9C8D6, #F0A0BC)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 20, boxShadow: '0 2px 10px rgba(244,165,184,.4)',
+            animation: 'beePulse 4s ease-in-out infinite',
+          }}>🐝</div>
+          <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontStyle: 'italic', fontWeight: 600, color: 'var(--primary-dark)', letterSpacing: '-.2px' }}>
             Beeplanner
           </span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+
+        {/* Botões */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {user ? (
             <button onClick={() => navigate('/inicio')} style={navBtnStyle(true)}>
               Ir para o app →
             </button>
           ) : (
             <>
-              {/* "Entrar" → abre /login na aba email+senha */}
-              <button onClick={onLoginClick} style={navBtnStyle(false)}>
-                Entrar
-              </button>
-              {/* "Começar grátis" → abre /login?mode=register no cadastro */}
-              <button onClick={onGetStarted} style={navBtnStyle(true)}>
-                Começar grátis
-              </button>
+              <button onClick={onLoginClick} style={navBtnStyle(false)}>Entrar</button>
+              <button onClick={onGetStarted} style={navBtnStyle(true)}>Começar grátis →</button>
             </>
           )}
         </div>
@@ -142,7 +159,7 @@ export default function Welcome({ onLoginClick, onGetStarted }: WelcomeProps) {
           background: 'radial-gradient(ellipse 55% 45% at 80% 25%, rgba(244,165,184,.22) 0%, transparent 60%), radial-gradient(ellipse 40% 40% at 15% 80%, rgba(249,199,132,.14) 0%, transparent 55%)',
         }}/>
 
-        <div style={{ maxWidth: 1180, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center', position: 'relative', zIndex: 1, width: '100%' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 60, alignItems: 'center', position: 'relative', zIndex: 1, width: '100%' }}>
 
           {/* Left */}
           <div className="reveal">
@@ -151,9 +168,10 @@ export default function Welcome({ onLoginClick, onGetStarted }: WelcomeProps) {
               padding: '5px 14px 5px 10px',
               background: 'rgba(244,165,184,.12)', border: '1px solid rgba(244,165,184,.35)',
               borderRadius: 99, fontSize: 13, color: 'var(--primary-dark)', fontWeight: 500, marginBottom: 26,
+              animation: 'badgePulse 2.8s ease-in-out infinite',
             }}>
               <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--primary-dark)', display: 'inline-block', animation: 'blink 2.5s ease-in-out infinite' }}/>
-              Planner minimalista &amp; fofo
+              Inspirado nas criaturas mais organizadas da natureza
             </div>
 
             <h1 style={{
@@ -161,16 +179,18 @@ export default function Welcome({ onLoginClick, onGetStarted }: WelcomeProps) {
               fontSize: 'clamp(50px, 5.5vw, 78px)',
               fontWeight: 400, lineHeight: 1.04, letterSpacing: '-.5px', marginBottom: 22,
             }}>
-              Organize sua vida<br/>
-              <em style={{ color: 'var(--primary-dark)', fontStyle: 'italic' }}>com doçura</em> 🍯
+              Tudo em 🍯<br/>
+              <em style={{ color: 'var(--primary-dark)', fontStyle: 'italic' }}>um só lugar</em>
             </h1>
 
+            <p style={{ fontSize: 17, color: 'var(--muted)', lineHeight: 1.78, marginBottom: 14, maxWidth: 430, fontWeight: 300 }}>
+              Abelhas são as criaturas mais organizadas da natureza cada uma sabe sua tarefa, segue seu ritmo e contribui para o todo.
+            </p>
             <p style={{ fontSize: 17, color: 'var(--muted)', lineHeight: 1.78, marginBottom: 38, maxWidth: 430, fontWeight: 300 }}>
-              Planeje semanas, acompanhe hábitos, salve datas especiais e organize tudo em pastas num lugar bonito, rápido e que você vai amar usar.
+              O <strong style={{ color: 'var(--primary-dark)', fontWeight: 600 }}>BeePlanner</strong> é o seu favo de mel digital: hábitos, metas, finanças, estudos e muito mais tudo organizado, bonito e num só lugar.
             </p>
 
             <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 28 }}>
-              {/* Botão principal do hero também usa onGetStarted */}
               <button onClick={onGetStarted} style={{ ...navBtnStyle(true), fontSize: 20, padding: '18px 60px', borderRadius: 13 }}>
                 Criar conta grátis
               </button>
@@ -203,7 +223,7 @@ export default function Welcome({ onLoginClick, onGetStarted }: WelcomeProps) {
             >
               <div style={{ padding: '13px 18px', background: 'var(--surface2)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 9, background: 'linear-gradient(135deg,var(--primary),var(--accent))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>🐝</div>
+                  <div style={{ width: 42, height: 42, borderRadius: 12, background: 'linear-gradient(135deg,var(--primary),var(--accent))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>🐝</div>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 600 }}>Minha Semana</div>
                     <div style={{ fontSize: 11, color: 'var(--muted)' }}>Beeplanner</div>
@@ -214,12 +234,12 @@ export default function Welcome({ onLoginClick, onGetStarted }: WelcomeProps) {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '48px repeat(5,1fr)', borderBottom: '1px solid var(--border)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '56px repeat(5,1fr)', borderBottom: '1px solid var(--border)' }}>
                 <div style={calColH(false)}/>
                 {[['Seg','ld1',false],['Ter','ld2',true],['Qua','ld3',false],['Qui','ld4',false],['Sex','ld5',false]].map(([d, id, tod]) => (
                   <div key={id as string} style={calColH(tod as boolean)}>
-                    <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.8px', color: 'var(--muted)' }}>{d}</span>
-                    <span id={id as string} style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 18, color: tod ? 'var(--primary-dark)' : 'var(--text)', display: 'block', marginTop: 1 }}/>
+                    <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.8px', color: 'var(--muted)' }}>{d}</span>
+                    <span id={id as string} style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 22, color: tod ? 'var(--primary-dark)' : 'var(--text)', display: 'block', marginTop: 2 }}/>
                   </div>
                 ))}
               </div>
@@ -230,12 +250,12 @@ export default function Welcome({ onLoginClick, onGetStarted }: WelcomeProps) {
                 { time: '12h', cols: [null, {t:'🍱 Almoço',c:'#F9C784'}, {t:'🍱 Almoço',c:'#F9C784'}, null, null] },
                 { time: '14h', cols: [null, null, {t:'💻 Review',c:'#F4A5B8'}, null, {t:'🚀 Deploy',c:'#B56EFF'}] },
               ].map((row, ri) => (
-                <div key={ri} style={{ display: 'grid', gridTemplateColumns: '48px repeat(5,1fr)', borderBottom: ri < 3 ? '1px solid var(--border)' : 'none', minHeight: 50 }}>
-                  <div style={{ padding: '6px 7px 0', textAlign: 'right', fontSize: 10, color: 'var(--muted)' }}>{row.time}</div>
+                <div key={ri} style={{ display: 'grid', gridTemplateColumns: '56px repeat(5,1fr)', borderBottom: ri < 3 ? '1px solid var(--border)' : 'none', minHeight: 80 }}>
+                  <div style={{ padding: '8px 10px 0', textAlign: 'right', fontSize: 11, color: 'var(--muted)' }}>{row.time}</div>
                   {row.cols.map((chip, ci) => (
                     <div key={ci}>
                       {chip && (
-                        <div style={{ margin: '4px 3px', borderRadius: 7, padding: '4px 8px', fontSize: 11, fontWeight: 600, borderLeft: `3px solid ${chip.c}`, background: chip.c + '20', color: 'var(--text)', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+                        <div style={{ margin: '6px 4px', borderRadius: 8, padding: '5px 10px', fontSize: 12, fontWeight: 600, borderLeft: `3px solid ${chip.c}`, background: chip.c + '20', color: 'var(--text)', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
                           {chip.t}
                         </div>
                       )}
@@ -251,58 +271,67 @@ export default function Welcome({ onLoginClick, onGetStarted }: WelcomeProps) {
       {/* ── STRIP ── */}
       <div style={{
         background: 'linear-gradient(90deg, rgba(196,88,128,0.07) 0%, rgba(244,165,184,0.05) 50%, rgba(212,160,96,0.07) 100%)',
-        padding: '15px 0',
-        overflow: 'hidden',
+        padding: '15px 0', overflow: 'hidden',
         maskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)',
         WebkitMaskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)',
       }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          animation: 'stripScroll 34s linear infinite',
-          width: 'max-content',
-          willChange: 'transform',
-        }}>
+        <div style={{ display: 'flex', alignItems: 'center', animation: 'stripScroll 34s linear infinite', width: 'max-content', willChange: 'transform' }}>
           {[...Array(3)].flatMap((_, rep) =>
             STRIP_ITEMS.map(([ico, txt], i) => (
-              <div key={`${rep}-${i}`} style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 9,
-                whiteSpace: 'nowrap',
-              }}>
-                {/* ícone na cor primária da marca */}
+              <div key={`${rep}-${i}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 9, whiteSpace: 'nowrap' }}>
                 <span style={{ color: 'var(--primary-dark)', display: 'flex', alignItems: 'center' }}>{ico}</span>
-                {/* texto uppercase tech */}
-                <span style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                  color: 'var(--muted)',
-                }}>
-                  {txt}
-                </span>
-                {/* separador entre itens */}
-                <span style={{
-                  margin: '0 20px',
-                  color: 'var(--border)',
-                  fontSize: 10,
-                }}>◆</span>
+                <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--muted)' }}>{txt}</span>
+                <span style={{ margin: '0 20px', color: 'var(--border)', fontSize: 10 }}>◆</span>
               </div>
             ))
           )}
         </div>
       </div>
 
-      {/* ── FEATURES ── */}
-      <div style={{ maxWidth: 1180, margin: '0 auto', padding: '96px 60px' }}>
-        <div className="reveal" style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, color: 'var(--primary-dark)', marginBottom: 14 }}>O que tem no planner</div>
-          <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 'clamp(36px,4vw,52px)', fontStyle: 'italic', marginBottom: 14, lineHeight: 1.1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14 }}>
-            Tudo que você precisa <Sparkles size={32} color="var(--primary-dark)" />
+      {/* ── POR QUE ABELHAS ── */}
+      <div style={{ maxWidth: 1180, margin: '0 auto', padding: '96px 60px 64px' }}>
+        <div className="reveal" style={{ textAlign: 'center', marginBottom: 56 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, color: 'var(--primary-dark)', marginBottom: 14 }}>Por que BeePlanner?</div>
+          <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 'clamp(34px,4vw,52px)', fontStyle: 'italic', lineHeight: 1.1, marginBottom: 18 }}>
+            O nome tem um motivo 🐝
           </h2>
-          <p style={{ fontSize: 16, color: 'var(--muted)', maxWidth: 500, lineHeight: 1.75, fontWeight: 300, marginBottom: 52, margin: '0 auto 52px' }}>Um planner completo, bonito e sem complicação feito pra quem quer organizar a vida com leveza.</p>
+          <p style={{ fontSize: 16, color: 'var(--muted)', maxWidth: 560, lineHeight: 1.75, fontWeight: 300, margin: '0 auto' }}>
+            Abelhas são as criaturas mais organizadas da natureza. Uma colmeia inteira funciona com zero caos — cada inseto sabe exatamente sua célula, sua missão e seu tempo. É essa energia que o BeePlanner traz pra sua rotina.
+          </p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24 }}>
+          {BEE_PILLARS.map(({ emoji, title, desc }) => (
+            <div key={title} className="reveal" style={{
+              padding: '36px 28px',
+              borderRadius: 22,
+              border: '1px solid var(--border)',
+              background: 'var(--surface)',
+              textAlign: 'center',
+              transition: 'all .22s ease',
+              cursor: 'default',
+            }}
+              onMouseEnter={e => Object.assign(e.currentTarget.style, { transform: 'translateY(-6px)', boxShadow: '0 20px 48px var(--shadow)', borderColor: 'var(--primary)' })}
+              onMouseLeave={e => Object.assign(e.currentTarget.style, { transform: 'none', boxShadow: 'none', borderColor: 'var(--border)' })}
+            >
+              <div style={{ fontSize: 40, marginBottom: 16, display: 'block' }}>{emoji}</div>
+              <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 12, color: 'var(--text)' }}>{title}</div>
+              <div style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.75, fontWeight: 300 }}>{desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── FEATURES ── */}
+      <div style={{ maxWidth: 1180, margin: '0 auto', padding: '16px 60px 96px' }}>
+        <div className="reveal" style={{ textAlign: 'center', marginBottom: 52 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, color: 'var(--primary-dark)', marginBottom: 14 }}>Sua colmeia digital</div>
+          <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 'clamp(36px,4vw,52px)', fontStyle: 'italic', lineHeight: 1.1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14 }}>
+            Cada módulo, uma célula <Sparkles size={32} color="var(--primary-dark)" />
+          </h2>
+          <p style={{ fontSize: 16, color: 'var(--muted)', maxWidth: 500, lineHeight: 1.75, fontWeight: 300, margin: '14px auto 0' }}>
+            Como numa colmeia, cada área da sua vida tem seu espaço perfeito — organizado, bonito e sem complicação.
+          </p>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 20 }}>
           {FEATURES.map(([icon, title, desc]) => (
@@ -325,7 +354,7 @@ export default function Welcome({ onLoginClick, onGetStarted }: WelcomeProps) {
           <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 'clamp(34px,4vw,50px)', fontStyle: 'italic', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14 }}>
             Temas por profissão <Palette size={30} color="var(--primary-dark)" />
           </h2>
-          <p style={{ color: 'var(--muted)', fontSize: 16, fontWeight: 300, marginBottom: 48 }}>Para cada área e momento você escolhe o seu estilo</p>
+          <p style={{ color: 'var(--muted)', fontSize: 16, fontWeight: 300, marginBottom: 48 }}>Cada abelha tem sua colmeia. Você escolhe o seu estilo.</p>
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             {APP_THEMES.map(({ Icon, label, color }) => (
               <div key={label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '16px 18px', borderRadius: 16, background: 'var(--surface)', border: '1px solid var(--border)', minWidth: 90, transition: 'all .22s', cursor: 'default' }}
@@ -345,11 +374,12 @@ export default function Welcome({ onLoginClick, onGetStarted }: WelcomeProps) {
       {/* ── CTA ── */}
       <div style={{ maxWidth: 1180, margin: '0 auto', padding: '80px 60px' }}>
         <div className="reveal" style={{ background: 'linear-gradient(135deg, #F9C8D6 0%, #F0A0BC 40%, #E8799A 100%)', borderRadius: 28, padding: '70px 60px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-          {/* ícone decorativo de fundo */}
-          <Heart size={160} style={{ position: 'absolute', right: 40, top: '50%', transform: 'translateY(-50%)', opacity: .06, pointerEvents: 'none', color: '#fff' }} />
-          <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 44, color: 'white', marginBottom: 14, fontStyle: 'italic' }}>Pronta para começar?</h2>
+          <span style={{ position: 'absolute', right: 60, top: '50%', transform: 'translateY(-50%)', fontSize: 120, opacity: .07, pointerEvents: 'none', lineHeight: 1 }}>🐝</span>
+          <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 44, color: 'white', marginBottom: 14, fontStyle: 'italic' }}>
+            Pronta para montar sua colmeia?
+          </h2>
           <p style={{ color: 'rgba(255,255,255,.88)', fontSize: 17, marginBottom: 36, fontWeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-            Crie sua conta grátis e organize sua vida hoje mesmo
+            Crie sua conta grátis e organize sua vida com a eficiência de uma abelha
             <Sparkles size={17} style={{ color: 'white', flexShrink: 0 }} />
           </p>
           <button
@@ -380,6 +410,7 @@ export default function Welcome({ onLoginClick, onGetStarted }: WelcomeProps) {
 
       <style>{`
         @keyframes beePulse   { 0%,100%{transform:scale(1) rotate(-4deg)} 50%{transform:scale(1.07) rotate(4deg)} }
+        @keyframes badgePulse { 0%,100%{opacity:1; box-shadow:0 0 0 0 rgba(244,165,184,0)} 50%{opacity:.75; box-shadow:0 0 0 6px rgba(244,165,184,.18)} }
         @keyframes float      { 0%,100%{transform:translateY(0) rotate(-3deg)} 50%{transform:translateY(-14px) rotate(3deg)} }
         @keyframes blink      { 0%,100%{opacity:1} 50%{opacity:.3} }
         @keyframes stripScroll{ 0%{transform:translateX(0)} 100%{transform:translateX(-33.333%)} }
@@ -399,8 +430,8 @@ export default function Welcome({ onLoginClick, onGetStarted }: WelcomeProps) {
 
 function navBtnStyle(primary: boolean): React.CSSProperties {
   return primary
-    ? { background: 'linear-gradient(135deg,var(--primary-dark),#D4668A)', color: 'white', border: 'none', padding: '10px 22px', borderRadius: 10, fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans',system-ui,sans-serif", boxShadow: '0 4px 16px var(--shadow)', transition: 'all .22s' }
-    : { background: 'transparent', color: 'var(--text)', border: '1.5px solid var(--border)', padding: '9px 20px', borderRadius: 10, fontSize: 13.5, fontWeight: 500, cursor: 'pointer', fontFamily: "'DM Sans',system-ui,sans-serif", transition: 'all .22s' };
+    ? { background: 'linear-gradient(135deg, #F0A0BC, #C45880)', color: 'white', border: 'none', padding: '10px 22px', borderRadius: 50, fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans',system-ui,sans-serif", boxShadow: '0 4px 18px rgba(196,88,128,.3)', transition: 'all .22s', letterSpacing: '.01em' }
+    : { background: 'rgba(244,165,184,.1)', color: 'var(--primary-dark)', border: '1.5px solid rgba(244,165,184,.4)', padding: '9px 20px', borderRadius: 50, fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans',system-ui,sans-serif", transition: 'all .22s' };
 }
 
 function calColH(today: boolean): React.CSSProperties {

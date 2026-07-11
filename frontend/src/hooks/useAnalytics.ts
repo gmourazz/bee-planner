@@ -129,10 +129,26 @@ export function useAnalytics(ano: number, mes: number): AnalyticsData {
 
   // KPIs derivados
   const tarefasConcluidas = tarefasPorMes.reduce((a, b) => a + b, 0)
-  const taxaHabitos = habitosTaxaPorMes.filter(v => v > 0).length > 0
-    ? Math.round(habitosTaxaPorMes.filter(v => v > 0).reduce((a, b) => a + b, 0) / habitosTaxaPorMes.filter(v => v > 0).length)
+
+  // Taxa: considera apenas meses até o mês atual (meses futuros têm 0 natural)
+  const anoAtualCalc = new Date().getFullYear()
+  const mesAtualCalc = new Date().getMonth()
+  const mesesValidos = habitosTaxaPorMes.filter((v, i) => {
+    if (ano < anoAtualCalc) return true
+    return i <= mesAtualCalc
+  })
+  const taxaHabitos = mesesValidos.filter(v => v > 0).length > 0
+    ? Math.round(mesesValidos.filter(v => v > 0).reduce((a, b) => a + b, 0) / mesesValidos.filter(v => v > 0).length)
     : 0
-  const livrosLidos = livros.filter(b => b.finishedAt?.startsWith(String(ano))).length
+
+  // Livros lidos: usa finishedAt se disponível, senão created_at para livros com status 'lido'
+  const anoStr2 = String(ano)
+  const livrosLidos = livros.filter(b => {
+    if (b.finishedAt) return b.finishedAt.startsWith(anoStr2)
+    if (b.status === 'lido') return b.created_at?.startsWith(anoStr2)
+    return false
+  }).length
+
   const cursosConcluidos = cursos.filter(c => c.status === 'completed').length
 
   return {

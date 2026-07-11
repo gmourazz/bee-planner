@@ -2,18 +2,18 @@
 // Importe daqui em qualquer módulo para manter consistência visual
 
 export const CATEGORY_COLORS = {
-  tarefa:    { color: '#E8799A', bg: '#FFF0EC' },
-  habito:    { color: '#2563eb', bg: '#dbeafe' },
-  livro:     { color: '#7c3aed', bg: '#ede9fe' },
-  curso:     { color: '#0891b2', bg: '#cffafe' },
+  tarefa: { color: '#F9A8D4', bg: '#FDF2F8' },  // pink-300
+  habito: { color: '#60A5FA', bg: '#EFF6FF' },  // blue-400
+  livro:  { color: '#A78BFA', bg: '#F5F3FF' },  // violet-400
+  curso:  { color: '#67E8F9', bg: '#ECFEFF' },  // cyan-300
 } as const
 
 export const STATUS_COLORS = {
-  concluido:    { color: '#22c55e', bg: '#dcfce7' },
-  pendente:     { color: '#E8799A', bg: '#FFF0EC' },
-  atrasado:     { color: '#dc2626', bg: '#fee2e2' },
-  em_andamento: { color: '#d97706', bg: '#fef3c7' },
-  danger:       { color: '#ef4444', bg: '#fee2e2' },
+  concluido:    { color: '#7BC4A8', bg: '#F0FAF5' },  // sage green pastel
+  pendente:     { color: '#F9A8D4', bg: '#FDF2F8' },  // pink-300
+  atrasado:     { color: '#D49898', bg: '#FDF0F0' },  // dusty rose pastel
+  em_andamento: { color: '#FDBA74', bg: '#FFF7ED' },  // peach
+  danger:       { color: '#D49898', bg: '#FDF0F0' },  // dusty rose pastel
 } as const
 
 // Tipo auxiliar para usar nos components

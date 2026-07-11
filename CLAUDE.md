@@ -21,19 +21,19 @@ npm run dev      # inicia em http://localhost:5173
 npm run build    # build de produção
 ```
 
-### Backend (`backend-go/`) — ativo
+### Backend (`backend/`) — ativo (Go)
 ```bash
 go run main.go   # inicia em http://localhost:3001
 go build ./...   # verifica compilação
 go vet ./...     # lint
 ```
 
-> O backend antigo em `backend/` (Node/Express) foi migrado integralmente para Go e fica mantido só como referência — **não rodar** (ocuparia a mesma porta 3001).
+> O backend foi migrado de Node/Express para Go. A pasta `backend-go/` era o nome antigo — o código Go está hoje em `backend/`.
 
 ### Verificar tipos
 ```bash
-cd frontend  && node_modules/.bin/tsc --noEmit
-cd backend-go && go build ./... && go vet ./...
+cd frontend && npm run build          # vite compila + verifica TS (node_modules/.bin/tsc não existe no projeto)
+cd backend  && go build ./... && go vet ./...
 ```
 
 **`frontend/.env`**
@@ -43,7 +43,7 @@ VITE_SUPABASE_ANON_KEY=
 VITE_API_URL=http://localhost:3001
 ```
 
-**`backend-go/.env`**
+**`backend/.env`**
 ```
 PORT=3001
 SUPABASE_URL=
@@ -102,11 +102,36 @@ Tema `tech` aplica `filter: grayscale(1)` em todo `AppLayout`, **exceto** `/perf
 
 ### PageLayout
 - Envolve todas as rotas autenticadas
-- Exibe header (ícone + título) apenas para rotas presentes em `ROUTE_MAP` — `/inicio` não tem header
+- Exibe header (ícone + título) para todas as rotas presentes em `ROUTE_MAP` (incluindo `/inicio`)
 - **Páginas não devem ter `<h1>` próprio** — o `PageLayout` já exibe o título
+- Para adicionar uma nova rota ao header, inserir entrada em `ROUTE_MAP` em `components/PageLayout.tsx`
 
 ### Responsividade desktop
 Todas as páginas autenticadas usam um wrapper interno `<div className="max-w-6xl mx-auto w-full">` (ou `max-w-7xl` para páginas mais largas) para limitar o conteúdo em telas grandes. Modais com `fixed inset-0` ficam **fora** desse wrapper mas dentro do div de scroll externo.
+
+### Modais
+Quando uma página precisa renderizar um modal **e** um portal (ex: `DatePickerInput` com `direction="down"` usa `ReactDOM.createPortal`), o `return` do componente deve ser envolvido em `<>...</>` (Fragment) para suportar dois elementos raiz:
+```tsx
+return (
+  <>
+    <div className="flex-1 overflow-auto ...">...</div>
+    {showModal && <div className="fixed inset-0 ...">..</div>}
+  </>
+)
+```
+Fundo dos modais: `backdropFilter: 'blur(6px)'` + `rgba(0,0,0,0.35)`.
+
+### DatePickerInput
+Componente em `components/DatePickerInput.tsx` — calendário visual com navegação por mês/ano. Props principais:
+- `direction="up"` → popup abre para cima (padrão, `position: absolute`)
+- `direction="down"` → popup abre via `ReactDOM.createPortal` com `position: fixed` (usar dentro de modais para não ser cortado pelo `overflow`)
+
+### Upserts com data opcional
+Hooks de saúde e hidratação aceitam `date?` para permitir registro em dias passados:
+```ts
+setSteps(value, date?)       // useHealth — salva passos para a data informada (ou hoje)
+setWaterDirect(value, date?) // useHealth — salva água para a data informada (ou hoje)
+```
 
 ### Deploy (Hostinger)
 - Build: `cd frontend && npm run build` — gera `dist/`
@@ -122,6 +147,12 @@ export function invalidateCache() { _cache = null }
 // createXxx/deleteXxx/toggleXxx chamam invalidateCache() antes de retornar
 ```
 
+### Sidebar — grupos de menu sem rota
+Itens de menu que agrupam subitens (Estudos, Agenda, Financeiro) usam `groupOnly: true` na configuração de `sections` em `Sidebar.tsx`. Esses itens renderizam um `<button>` em vez de `<NavLink>` e abrem/fecham o grupo ao clicar. A rota `path` nesses itens não é navegada — serve só como chave de estado de expansão.
+
+### Selects customizados
+O projeto **não usa `<select>` nativo** — causa dropdown com tema do sistema operacional. O padrão é um componente próprio: botão com `primaryLight` + `ChevronDown`, dropdown `fixed`/`absolute` com `rounded-2xl` e `shadow-xl`, cada opção como `<button>` com check ao lado quando selecionada. Ver `FitnessSelect` em `FitnessPage.tsx` e `GeneroFiltroSelect` em `BooksPage.tsx` como referência.
+
 ### Backend (`backend-go/`)
 
 Framework: **Gin**. Acesso a dados: conexão direta ao Postgres via **pgx** (não passa pela API REST do Supabase, exceto para auth — ver abaixo).
@@ -136,12 +167,16 @@ Framework: **Gin**. Acesso a dados: conexão direta ao Postgres via **pgx** (nã
 | `internal/<modulo>/` | Um pacote por módulo: `<modulo>_controller.go` + `<modulo>_routes.go` |
 
 **Padrão para novo módulo backend:**
-1. Criar SQL em `backend/src/migrations/` (mantém o histórico de migrations no mesmo lugar) e rodar via Management API do Supabase
+1. Criar SQL em `backend/migrations/` (histórico centralizado) e rodar via psql ou Management API do Supabase
 2. Criar `internal/nome/nome_controller.go` (handlers Gin) e `nome_routes.go` (`RegisterRoutes`)
 3. Registrar `nome.RegisterRoutes(api.Group("/nome"), db, authClient)` em `main.go`
-4. Rodas que retornam linhas do Postgres: usar `pgx.CollectRows`/`CollectOneRow` com `dbutil.RowToMap` em vez de `SELECT *` cru
+4. Rotas que retornam linhas do Postgres: usar `pgx.CollectRows`/`CollectOneRow` com `dbutil.RowToMap` em vez de `SELECT *` cru
 5. Atualizações parciais (`PUT`/`PATCH`): construir `SET` dinâmico só com os campos enviados (ver qualquer controller existente como exemplo)
 6. Aguardar aprovação da Giovanna para o próximo módulo
+
+**Módulos frontend-only (Supabase direto):** quando o módulo não precisa de `SERVICE_KEY`, criar só `services/nome.ts` + `hooks/useNome.ts` + `types/nome.types.ts` + página. Não é necessário criar rota no backend. Exemplo: Fitness, Analytics.
+
+**Rotas públicas no backend (sem `RequireAuth`):** registrar diretamente no `router` antes de criar o subgrupo `authed`. Ver `health_routes.go` — `POST /sync` é público (autenticado por `sync_token` no body), o restante usa `middleware.RequireAuth`.
 
 ---
 
@@ -164,8 +199,9 @@ Framework: **Gin**. Acesso a dados: conexão direta ao Postgres via **pgx** (nã
 | 12 | Saúde | `/api/health` | ✅ Feito |
 | 13 | Analytics | `/dashboard` (frontend only) | ✅ Feito (dados via Supabase direto — `useAnalytics` + `useDashboardSummaries`) |
 | 14 | Integrações | `/api/integrations` | ✅ Feito |
+| 15 | Fitness | `/fitness` (frontend only) | ✅ Feito — 5 abas (Treinos, Corpo, Dieta, Desafios, Dispositivos). Supabase direto: tabelas `fitness_workouts`, `fitness_body`, `fitness_challenges`, `fitness_meals`, `fitness_goals`. Sub-item de Hábitos no menu. |
 
-Todos os módulos com rota base `/api/*` rodam hoje em **`backend-go/`** (Go/Gin). O código em `backend/` (Node/Express) não é mais usado, mantido só de referência.
+Todos os módulos com rota base `/api/*` rodam hoje em **`backend/`** (Go/Gin).
 
 ---
 

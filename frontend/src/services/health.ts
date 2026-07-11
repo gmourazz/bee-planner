@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase'
+import { apiFetch } from '../lib/client'
 import type { HealthLog } from '../types/health.types'
 
 async function uid() {
@@ -11,13 +12,22 @@ function mapLog(r: any): HealthLog {
   return {
     id: r.id,
     log_date: r.log_date,
-    water: r.water,
-    sleep: Number(r.sleep),
+    water: r.water ?? 0,
+    sleep: Number(r.sleep ?? 0),
     mood: r.mood ?? null,
     exercises: r.exercises ?? [],
-    steps: r.steps,
+    steps: r.steps ?? 0,
+    active_calories: r.active_calories ?? 0,
+    avg_heart_rate: r.avg_heart_rate ?? 0,
     created_at: r.created_at,
   }
+}
+
+export async function fetchSyncToken(): Promise<string> {
+  const res = await apiFetch('/api/health/sync-token')
+  if (!res.ok) throw new Error('Erro ao buscar token')
+  const data = await res.json()
+  return data.sync_token as string
 }
 
 export async function fetchHealthLogs(sinceDate: string): Promise<HealthLog[]> {

@@ -22,8 +22,10 @@ import { FinancePage } from "./pages/FinancePage";
 import { HealthPage } from "./pages/HealthPage";
 import { GoalsPage } from "./pages/GoalsPage";
 import { SeriesPage } from "./pages/SeriesPage";
+import { FitnessPage } from "./pages/FitnessPage";
 import { ToastProvider } from "./components/Toast";
 import { PageLayout } from "./components/PageLayout";
+import { PageHeaderProvider } from "./contexts/PageHeaderContext";
 
 function AppLayout() {
   const { signOut } = useAuth();
@@ -48,6 +50,7 @@ function AppLayout() {
         className="flex-1 flex overflow-hidden"
         style={{ filter: grayscaleFilter }}
       >
+        <PageHeaderProvider>
         <PageLayout>
           <Routes>
             <Route path="/inicio"        element={<DashboardPage userName="Usuária" />} />
@@ -61,6 +64,7 @@ function AppLayout() {
             <Route path="/universitario" element={<UniversityPage />} />
             <Route path="/financas"      element={<FinancePage />} />
             <Route path="/saude"         element={<HealthPage />} />
+            <Route path="/fitness"       element={<FitnessPage />} />
             <Route path="/series"        element={<SeriesPage />} />
             <Route path="/metas"         element={<GoalsPage />} />
             <Route path="/perfil"        element={<ProfilePage />} />
@@ -68,6 +72,7 @@ function AppLayout() {
             <Route path="*"              element={<Navigate to="/inicio" replace />} />
           </Routes>
         </PageLayout>
+        </PageHeaderProvider>
       </div>
     </div>
   );

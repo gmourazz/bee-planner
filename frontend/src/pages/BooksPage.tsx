@@ -10,12 +10,12 @@ import { getCroppedImage } from '../utils/crop.utils'
 import type { PixelCrop } from '../utils/crop.utils'
 
 const GRADIENTS = [
-  'linear-gradient(135deg, #F472B6 0%, #EC4899 100%)',
-  'linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%)',
-  'linear-gradient(135deg, #A855F7 0%, #7C3AED 100%)',
-  'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
-  'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-  'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
+  'linear-gradient(135deg, #F9A8D4 0%, #FBCFE8 100%)',
+  'linear-gradient(135deg, #FDE68A 0%, #FCD34D 100%)',
+  'linear-gradient(135deg, #C4B5FD 0%, #DDD6FE 100%)',
+  'linear-gradient(135deg, #93C5FD 0%, #BFDBFE 100%)',
+  'linear-gradient(135deg, #6EE7B7 0%, #A7F3D0 100%)',
+  'linear-gradient(135deg, #FCA5A5 0%, #FECACA 100%)',
 ]
 
 const GENEROS = [

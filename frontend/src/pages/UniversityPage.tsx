@@ -12,7 +12,7 @@ import type { UniSubject } from '../types/uni.types'
 
 // ── Constantes ───────────────────────────────────────────────────────────────
 
-const COLORS = ['#F472B6', '#A855F7', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899']
+const COLORS = ['#F9A8D4', '#C4B5FD', '#60A5FA', '#34D399', '#FCD34D', '#F87171', '#A78BFA', '#F9A8D4']
 const DAYS   = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB']
 
 // Horários de 06:00 a 22:00

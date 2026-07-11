@@ -77,7 +77,7 @@ function GoalCard({ goal, onDelete, onEditProgress, onToggleComplete, onOpenEdit
           </button>
           <button onClick={onDelete} title="Excluir meta"
             className="w-7 h-7 rounded-lg flex items-center justify-center hover:opacity-70 transition-all"
-            style={{ background: "#EF444420" }}>
+            style={{ background: "#F8717120" }}>
             <Trash2 className="w-3.5 h-3.5 text-red-400" />
           </button>
         </div>

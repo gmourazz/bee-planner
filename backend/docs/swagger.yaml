@@ -1,0 +1,1660 @@
+basePath: /api
+definitions:
+  auth.loginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  auth.registerRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone:
+        description: opcional — usuário pode cadastrar sem telefone
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  books.criarLivroRequest:
+    properties:
+      author:
+        type: string
+      colorIdx:
+        type: integer
+      genres:
+        items:
+          type: string
+        type: array
+      rating:
+        type: integer
+      review:
+        type: string
+      title:
+        type: string
+    type: object
+  courses.cursoRequest:
+    properties:
+      certificate:
+        type: boolean
+      certificate_expiry:
+        type: string
+      credential:
+        type: string
+      duration:
+        type: string
+      end_date:
+        type: string
+      platform:
+        type: string
+      progress:
+        type: integer
+      start_date:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+    type: object
+  events.criarEventoRequest:
+    properties:
+      date:
+        type: string
+      description:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+    type: object
+  events.editarEventoRequest:
+    properties:
+      date:
+        type: string
+      description:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+    type: object
+  finance.criarTransacaoRequest:
+    properties:
+      amount:
+        type: number
+      category:
+        type: string
+      date:
+        type: string
+      description:
+        type: string
+      label:
+        type: string
+      recurring:
+        type: boolean
+      type:
+        type: string
+    type: object
+  finance.editarTransacaoRequest:
+    properties:
+      amount:
+        type: number
+      category:
+        type: string
+      date:
+        type: string
+      description:
+        type: string
+      label:
+        type: string
+      recurring:
+        type: boolean
+      type:
+        type: string
+    type: object
+  goals.atualizarProgressoRequest:
+    properties:
+      current:
+        type: number
+    type: object
+  goals.criarMetaRequest:
+    properties:
+      category:
+        type: string
+      color:
+        type: string
+      current:
+        type: number
+      deadline:
+        type: string
+      description:
+        type: string
+      month:
+        type: integer
+      scope:
+        type: string
+      target:
+        type: number
+      title:
+        type: string
+      unit:
+        type: string
+      year:
+        type: integer
+    type: object
+  goals.editarMetaRequest:
+    properties:
+      category:
+        type: string
+      color:
+        type: string
+      current:
+        type: number
+      deadline:
+        type: string
+      description:
+        type: string
+      target:
+        type: number
+      title:
+        type: string
+      unit:
+        type: string
+    type: object
+  habits.criarHabitoRequest:
+    properties:
+      color:
+        type: string
+      iconKey:
+        type: string
+      name:
+        type: string
+    type: object
+  habits.editarHabitoRequest:
+    properties:
+      color:
+        type: string
+      iconKey:
+        type: string
+      name:
+        type: string
+    type: object
+  habits.toggleRequest:
+    properties:
+      date:
+        type: string
+    type: object
+  health.upsertLogRequest:
+    properties:
+      exercises:
+        items:
+          type: string
+        type: array
+      mood:
+        type: integer
+      sleep:
+        type: number
+      steps:
+        type: integer
+      water:
+        type: integer
+    type: object
+  integrations.criarEventoGoogleRequest:
+    properties:
+      date:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+    type: object
+  integrations.criarEventoOutlookRequest:
+    properties:
+      date:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+    type: object
+  notes.criarNotaRequest:
+    properties:
+      category:
+        type: string
+      color:
+        type: string
+      content:
+        type: string
+      isPinned:
+        type: boolean
+      title:
+        type: string
+    type: object
+  notes.editarNotaRequest:
+    properties:
+      category:
+        type: string
+      color:
+        type: string
+      content:
+        type: string
+      isPinned:
+        type: boolean
+      title:
+        type: string
+    type: object
+  notes.togglePinRequest:
+    properties:
+      isPinned:
+        type: boolean
+    type: object
+  profile.updateProfileRequest:
+    properties:
+      avatar_url:
+        type: string
+      bio:
+        type: string
+      birthdate:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
+  profile.updateRoleRequest:
+    properties:
+      role:
+        type: string
+    type: object
+  university.aulaRequest:
+    properties:
+      color_idx:
+        type: integer
+      day_of_week:
+        type: integer
+      room:
+        type: string
+      semester:
+        type: string
+      subject_name:
+        type: string
+      time_start:
+        type: string
+    type: object
+  university.criarProvaRequest:
+    properties:
+      description:
+        type: string
+      exam_date:
+        type: string
+      status:
+        type: string
+      subject:
+        type: string
+      type:
+        type: string
+    type: object
+  university.materiaRequest:
+    properties:
+      absences:
+        type: integer
+      attendance:
+        type: number
+      color_idx:
+        type: integer
+      credits:
+        type: integer
+      end_date:
+        type: string
+      grade:
+        type: number
+      icon:
+        type: string
+      max_absences:
+        type: integer
+      name:
+        type: string
+      professor:
+        type: string
+      semester:
+        type: string
+      start_date:
+        type: string
+      subject_status:
+        type: string
+    type: object
+  university.toggleProvaRequest:
+    properties:
+      status:
+        type: string
+    type: object
+host: localhost:3001
+info:
+  contact: {}
+  description: 'API do BeePlanner — autenticação via JWT (Bearer). Todas as rotas
+    /api/* (exceto /auth) exigem o header Authorization: Bearer <token>.'
+  title: BeePlanner API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Credenciais
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/auth.loginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Logout
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dados de cadastro
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/auth.registerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cadastrar usuário
+      tags:
+      - Auth
+  /books:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar livros
+      tags:
+      - Books
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dados do livro
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/books.criarLivroRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar livro
+      tags:
+      - Books
+  /books/{id}:
+    delete:
+      parameters:
+      - description: ID do livro
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Deletar livro
+      tags:
+      - Books
+  /courses:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Listar cursos
+      tags:
+      - Courses
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dados do curso
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/courses.cursoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar curso
+      tags:
+      - Courses
+  /courses/{id}:
+    delete:
+      parameters:
+      - description: ID do curso
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      security:
+      - BearerAuth: []
+      summary: Deletar curso
+      tags:
+      - Courses
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID do curso
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Campos a atualizar
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/courses.cursoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Editar curso
+      tags:
+      - Courses
+  /events:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Listar eventos
+      tags:
+      - Events
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dados do evento
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/events.criarEventoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar evento
+      tags:
+      - Events
+  /events/{id}:
+    delete:
+      parameters:
+      - description: ID do evento
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Deletar evento
+      tags:
+      - Events
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID do evento
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Campos a atualizar
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/events.editarEventoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Editar evento
+      tags:
+      - Events
+  /finance:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Listar transações
+      tags:
+      - Finance
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dados da transação
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/finance.criarTransacaoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar transação
+      tags:
+      - Finance
+  /finance/{id}:
+    delete:
+      parameters:
+      - description: ID da transação
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      security:
+      - BearerAuth: []
+      summary: Deletar transação
+      tags:
+      - Finance
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID da transação
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Campos a atualizar
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/finance.editarTransacaoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Editar transação
+      tags:
+      - Finance
+  /goals:
+    get:
+      parameters:
+      - description: annual ou monthly
+        in: query
+        name: scope
+        type: string
+      - description: Ano
+        in: query
+        name: year
+        type: integer
+      - description: Mês (1-12)
+        in: query
+        name: month
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar metas
+      tags:
+      - Goals
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dados da meta
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/goals.criarMetaRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar meta
+      tags:
+      - Goals
+  /goals/{id}:
+    delete:
+      parameters:
+      - description: ID da meta
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      security:
+      - BearerAuth: []
+      summary: Deletar meta
+      tags:
+      - Goals
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID da meta
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Valor atual
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/goals.atualizarProgressoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualizar progresso da meta
+      tags:
+      - Goals
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID da meta
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Campos a atualizar
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/goals.editarMetaRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Editar meta
+      tags:
+      - Goals
+  /habits:
+    get:
+      description: Retorna todos os hábitos com conclusões dos últimos 60 dias e sequência
+        atual
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar hábitos
+      tags:
+      - Habits
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dados do hábito
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/habits.criarHabitoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar hábito
+      tags:
+      - Habits
+  /habits/{id}:
+    delete:
+      parameters:
+      - description: ID do hábito
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Deletar hábito
+      tags:
+      - Habits
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID do hábito
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Campos a atualizar
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/habits.editarHabitoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Editar hábito
+      tags:
+      - Habits
+  /habits/{id}/toggle:
+    post:
+      consumes:
+      - application/json
+      description: Marca ou desmarca o hábito numa data específica (YYYY-MM-DD)
+      parameters:
+      - description: ID do hábito
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/habits.toggleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Toggle conclusão do hábito
+      tags:
+      - Habits
+  /health:
+    get:
+      parameters:
+      - description: Filtrar a partir de (YYYY-MM-DD)
+        in: query
+        name: since
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Listar logs de saúde
+      tags:
+      - Health
+  /health/{date}:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Data (YYYY-MM-DD)
+        in: path
+        name: date
+        required: true
+        type: string
+      - description: Dados do log
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/health.upsertLogRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar ou atualizar log de saúde do dia
+      tags:
+      - Health
+  /integrations/google:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Desconectar Google Calendar
+      tags:
+      - Integrations
+  /integrations/google/connect:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Iniciar conexão com Google Calendar
+      tags:
+      - Integrations
+  /integrations/google/events:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Listar eventos do Google Calendar
+      tags:
+      - Integrations
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dados do evento
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/integrations.criarEventoGoogleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar evento no Google Calendar
+      tags:
+      - Integrations
+  /integrations/outlook:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Desconectar Outlook
+      tags:
+      - Integrations
+  /integrations/outlook/connect:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Iniciar conexão com Outlook Calendar
+      tags:
+      - Integrations
+  /integrations/outlook/events:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dados do evento
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/integrations.criarEventoOutlookRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar evento no Outlook Calendar
+      tags:
+      - Integrations
+  /integrations/status:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Status das integrações
+      tags:
+      - Integrations
+  /notes:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar notas
+      tags:
+      - Notes
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dados da nota
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/notes.criarNotaRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar nota
+      tags:
+      - Notes
+  /notes/{id}:
+    delete:
+      parameters:
+      - description: ID da nota
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Deletar nota
+      tags:
+      - Notes
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID da nota
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Campos a atualizar
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/notes.editarNotaRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Editar nota
+      tags:
+      - Notes
+  /notes/{id}/pin:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID da nota
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: isPinned
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/notes.togglePinRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Toggle pin da nota
+      tags:
+      - Notes
+  /profile/{id}/role:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID do usuário
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Novo role
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/profile.updateRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Alterar role de usuário (admin)
+      tags:
+      - Profile
+  /profile/all:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar todos os perfis (admin)
+      tags:
+      - Profile
+  /profile/me:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Meu perfil
+      tags:
+      - Profile
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Campos a atualizar
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/profile.updateProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualizar meu perfil
+      tags:
+      - Profile
+  /university/exams:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Listar provas
+      tags:
+      - University
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dados da prova
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/university.criarProvaRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar prova
+      tags:
+      - University
+  /university/exams/{id}:
+    delete:
+      parameters:
+      - description: ID da prova
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      security:
+      - BearerAuth: []
+      summary: Deletar prova
+      tags:
+      - University
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID da prova
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 'Status: pending ou done'
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/university.toggleProvaRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Toggle status da prova
+      tags:
+      - University
+  /university/schedule:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Listar grade horária
+      tags:
+      - University
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dados da aula
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/university.aulaRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar aula na grade
+      tags:
+      - University
+  /university/schedule/{id}:
+    delete:
+      parameters:
+      - description: ID da aula
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      security:
+      - BearerAuth: []
+      summary: Deletar aula da grade
+      tags:
+      - University
+  /university/subjects:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Listar matérias
+      tags:
+      - University
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dados da matéria
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/university.materiaRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Criar matéria
+      tags:
+      - University
+  /university/subjects/{id}:
+    delete:
+      parameters:
+      - description: ID da matéria
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      security:
+      - BearerAuth: []
+      summary: Deletar matéria
+      tags:
+      - University
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID da matéria
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Campos a atualizar
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/university.materiaRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Editar matéria
+      tags:
+      - University
+securityDefinitions:
+  BearerAuth:
+    description: 'Formato: Bearer <seu_jwt>'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

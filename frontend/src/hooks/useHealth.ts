@@ -50,14 +50,18 @@ export function useHealth() {
     upsert(todayKey, { water: next })
   }
 
-  const setWaterDirect = (value: number) => {
-    upsert(todayKey, { water: value })
+  const setWaterDirect = (value: number, date?: string) => {
+    upsert(date ?? todayKey, { water: value })
   }
 
   const adjustSleep = (delta: number) => {
     const current = logs[todayKey]?.sleep ?? 0
     const next = Math.max(0, Math.min(14, current + delta))
     upsert(todayKey, { sleep: next })
+  }
+
+  const setSleepDirect = (value: number, date?: string) => {
+    upsert(date ?? todayKey, { sleep: value })
   }
 
   const setMoodValue = (value: number) => {
@@ -72,11 +76,16 @@ export function useHealth() {
     upsert(todayKey, { exercises: next })
   }
 
+  const setSteps = (value: number, date?: string) => {
+    upsert(date ?? todayKey, { steps: value })
+  }
+
   return {
     logs, loading, weekKeys, todayKey,
     adjustWater, setWaterDirect,
-    adjustSleep,
+    adjustSleep, setSleepDirect,
     setMoodValue,
     toggleExercise,
+    setSteps,
   }
 }

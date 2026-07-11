@@ -10,7 +10,7 @@ function backendPlugin() {
   return {
     name: 'backend-go',
     configureServer() {
-      const backendDir = path.resolve(__dirname, '../backend-go')
+      const backendDir = path.resolve(__dirname, '../backend')
       proc = spawn('go', ['run', 'main.go'], {
         cwd: backendDir,
         stdio: 'inherit',

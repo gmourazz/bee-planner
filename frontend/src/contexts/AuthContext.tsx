@@ -42,16 +42,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { name, phone } }
+      options: { data: { name, phone, birthdate } }
     })
     if (error) throw error
     // Com confirmação de e-mail desativada, Supabase retorna sessão imediata
     if (data.session) {
       setSession(data.session)
       setUser(data.session.user)
-      // Salva birthdate na tabela profiles se informado
-      if (birthdate) {
-        await supabase.from('profiles').update({ birthdate }).eq('id', data.session.user.id)
+      // Salva phone e birthdate na tabela profiles
+      const profilePatch: Record<string, string> = {}
+      if (phone)     profilePatch.phone     = phone
+      if (birthdate) profilePatch.birthdate = birthdate
+      if (Object.keys(profilePatch).length > 0) {
+        await supabase.from('profiles').update(profilePatch).eq('id', data.session.user.id)
       }
       return true
     }

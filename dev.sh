@@ -10,7 +10,7 @@ echo "🐝 Backend  -> http://localhost:3001"
 echo "🐝 Frontend -> http://localhost:5173"
 echo
 
-(cd "$(dirname "$0")/backend-go" && go run main.go) &
+(cd "$(dirname "$0")/backend" && go run main.go) &
 (cd "$(dirname "$0")/frontend" && npm run dev) &
 
 wait

@@ -1,0 +1,24 @@
+{
+  "name": "beeplanerofc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cd frontend && npm run dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gmourazz/bee-planner.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/gmourazz/bee-planner/issues"
+  },
+  "homepage": "https://github.com/gmourazz/bee-planner#readme",
+  "devDependencies": {
+    "concurrently": "^10.0.3"
+  }
+}

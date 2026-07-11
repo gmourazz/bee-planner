@@ -36,18 +36,18 @@ import { DatePickerInput } from "../components/DatePickerInput";
 import type { Transaction } from "../types/finance.types";
 
 const CATEGORIES: Record<string, { icon: React.FC<{ className?: string; style?: React.CSSProperties }>; color: string; type: "expense" | "income" | "both" }> = {
-  "Casa":          { icon: Home,          color: "#6366F1", type: "expense" },
-  "Assinaturas":   { icon: Repeat,        color: "#8B5CF6", type: "expense" },
-  "Streamings":    { icon: Tv,            color: "#EC4899", type: "expense" },
-  "Contas":        { icon: Wifi,          color: "#3B82F6", type: "expense" },
-  "Estudos":       { icon: BookOpen,      color: "#10B981", type: "expense" },
-  "Supermercado":  { icon: ShoppingCart,  color: "#F59E0B", type: "expense" },
-  "Alimentação":   { icon: Utensils,      color: "#F97316", type: "expense" },
-  "Transporte":    { icon: Bus,           color: "#06B6D4", type: "expense" },
-  "Saúde":         { icon: Heart,         color: "#EF4444", type: "expense" },
-  "Lazer":         { icon: Smile,         color: "#A855F7", type: "expense" },
+  "Casa":          { icon: Home,          color: "#A5B4FC", type: "expense" },
+  "Assinaturas":   { icon: Repeat,        color: "#A78BFA", type: "expense" },
+  "Streamings":    { icon: Tv,            color: "#F9A8D4", type: "expense" },
+  "Contas":        { icon: Wifi,          color: "#60A5FA", type: "expense" },
+  "Estudos":       { icon: BookOpen,      color: "#7BC4A8", type: "expense" },
+  "Supermercado":  { icon: ShoppingCart,  color: "#FCD34D", type: "expense" },
+  "Alimentação":   { icon: Utensils,      color: "#FDBA74", type: "expense" },
+  "Transporte":    { icon: Bus,           color: "#67E8F9", type: "expense" },
+  "Saúde":         { icon: Heart,         color: "#D49898", type: "expense" },
+  "Lazer":         { icon: Smile,         color: "#C4B5FD", type: "expense" },
   "Vestuário":     { icon: Shirt,         color: "#F472B6", type: "expense" },
-  "Salário":       { icon: Briefcase,     color: "#10B981", type: "income" },
+  "Salário":       { icon: Briefcase,     color: "#7BC4A8", type: "income" },
   "Freelance":     { icon: CreditCard,    color: "#14B8A6", type: "income" },
   "Investimento":  { icon: PiggyBank,     color: "#22C55E", type: "income" },
   "Outros":        { icon: MoreHorizontal,color: "#6B7280", type: "both" },
@@ -161,7 +161,7 @@ export function FinancePage() {
 
   if (error) return (
     <div className="flex-1 flex items-center justify-center" style={{ background: currentTheme.colors.background }}>
-      <p className="text-sm text-red-500">{error}</p>
+      <p className="text-sm text-rose-300">{error}</p>
     </div>
   );
 
@@ -237,21 +237,21 @@ export function FinancePage() {
         <div className="px-6 pb-8 space-y-5">
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <SummaryCard icon={<TrendingUp className="w-5 h-5 text-green-600" />} iconBg="#D1FAE5" label="Receitas" value={fmt(monthIncome)} color="#059669" />
-            <SummaryCard icon={<TrendingDown className="w-5 h-5 text-red-500" />} iconBg="#FEE2E2" label="Despesas" value={fmt(monthExpense)} color="#EF4444" />
+            <SummaryCard icon={<TrendingUp className="w-5 h-5 text-teal-400" />} iconBg="#D1FAE5" label="Receitas" value={fmt(monthIncome)} color="#7BC4A8" />
+            <SummaryCard icon={<TrendingDown className="w-5 h-5 text-rose-300" />} iconBg="#FEE2E2" label="Despesas" value={fmt(monthExpense)} color="#D49898" />
             <SummaryCard
-              icon={<DollarSign className="w-5 h-5" style={{ color: monthBalance >= 0 ? "#059669" : "#DC2626" }} />}
+              icon={<DollarSign className="w-5 h-5" style={{ color: monthBalance >= 0 ? "#7BC4A8" : "#DC2626" }} />}
               iconBg={monthBalance >= 0 ? "#A7F3D0" : "#FECACA"}
               label="Saldo" value={fmt(monthBalance)}
-              color={monthBalance >= 0 ? "#059669" : "#DC2626"}
+              color={monthBalance >= 0 ? "#7BC4A8" : "#DC2626"}
             />
             <div className="rounded-2xl p-4" style={{ background: currentTheme.colors.surface, boxShadow: `0 2px 16px ${currentTheme.colors.primary}10` }}>
               <p className="text-xs mb-1" style={{ color: currentTheme.colors.textMuted }}>Taxa de Economia</p>
-              <p className="text-2xl font-bold" style={{ color: savingsRate >= 20 ? "#059669" : savingsRate >= 0 ? "#F59E0B" : "#EF4444" }}>
+              <p className="text-2xl font-bold" style={{ color: savingsRate >= 20 ? "#7BC4A8" : savingsRate >= 0 ? "#FCD34D" : "#D49898" }}>
                 {savingsRate}%
               </p>
               <div className="mt-2 h-1.5 rounded-full overflow-hidden" style={{ background: currentTheme.colors.primaryLight }}>
-                <div className="h-full rounded-full transition-all" style={{ width: `${Math.max(0, Math.min(100, savingsRate))}%`, background: savingsRate >= 20 ? "#10B981" : "#F59E0B" }} />
+                <div className="h-full rounded-full transition-all" style={{ width: `${Math.max(0, Math.min(100, savingsRate))}%`, background: savingsRate >= 20 ? "#7BC4A8" : "#FCD34D" }} />
               </div>
             </div>
           </div>
@@ -357,13 +357,13 @@ export function FinancePage() {
       {view === "annual" && (
         <div className="px-6 pb-8 space-y-5">
           <div className="grid grid-cols-3 gap-4">
-            <SummaryCard icon={<TrendingUp className="w-5 h-5 text-green-600" />} iconBg="#D1FAE5" label={`Receitas ${selectedYear}`} value={fmt(annualIncome)} color="#059669" />
-            <SummaryCard icon={<TrendingDown className="w-5 h-5 text-red-500" />} iconBg="#FEE2E2" label={`Despesas ${selectedYear}`} value={fmt(annualExpense)} color="#EF4444" />
+            <SummaryCard icon={<TrendingUp className="w-5 h-5 text-teal-400" />} iconBg="#D1FAE5" label={`Receitas ${selectedYear}`} value={fmt(annualIncome)} color="#7BC4A8" />
+            <SummaryCard icon={<TrendingDown className="w-5 h-5 text-rose-300" />} iconBg="#FEE2E2" label={`Despesas ${selectedYear}`} value={fmt(annualExpense)} color="#D49898" />
             <SummaryCard
-              icon={<DollarSign className="w-5 h-5" style={{ color: annualBalance >= 0 ? "#059669" : "#DC2626" }} />}
+              icon={<DollarSign className="w-5 h-5" style={{ color: annualBalance >= 0 ? "#7BC4A8" : "#DC2626" }} />}
               iconBg={annualBalance >= 0 ? "#A7F3D0" : "#FECACA"}
               label="Saldo Anual" value={fmt(annualBalance)}
-              color={annualBalance >= 0 ? "#059669" : "#DC2626"}
+              color={annualBalance >= 0 ? "#7BC4A8" : "#DC2626"}
             />
           </div>
 
@@ -379,12 +379,12 @@ export function FinancePage() {
                   <div className="w-full flex gap-0.5 items-end" style={{ height: "140px" }}>
                     <div
                       className="flex-1 rounded-t-md transition-all hover:opacity-80 cursor-pointer"
-                      style={{ height: `${m.inc > 0 ? (m.inc / maxChartVal) * 100 : 0}%`, background: "#10B981", minHeight: m.inc > 0 ? "4px" : "0" }}
+                      style={{ height: `${m.inc > 0 ? (m.inc / maxChartVal) * 100 : 0}%`, background: "#7BC4A8", minHeight: m.inc > 0 ? "4px" : "0" }}
                       title={`Receitas: ${fmt(m.inc)}`}
                     />
                     <div
                       className="flex-1 rounded-t-md transition-all hover:opacity-80 cursor-pointer"
-                      style={{ height: `${m.exp > 0 ? (m.exp / maxChartVal) * 100 : 0}%`, background: "#F87171", minHeight: m.exp > 0 ? "4px" : "0" }}
+                      style={{ height: `${m.exp > 0 ? (m.exp / maxChartVal) * 100 : 0}%`, background: "#D49898", minHeight: m.exp > 0 ? "4px" : "0" }}
                       title={`Despesas: ${fmt(m.exp)}`}
                     />
                   </div>
@@ -424,7 +424,7 @@ export function FinancePage() {
               <h3 className="font-display text-base font-semibold mb-4" style={{ color: currentTheme.colors.text }}>Resumo Mensal</h3>
               <div className="overflow-hidden rounded-xl border" style={{ borderColor: currentTheme.colors.primary + "15" }}>
                 <div className="grid grid-cols-4 px-3 py-2 text-[10px] font-semibold" style={{ background: currentTheme.colors.primaryLight, color: currentTheme.colors.primaryDark }}>
-                  <span>Mês</span><span className="text-right text-green-600">Receitas</span><span className="text-right text-red-500">Despesas</span><span className="text-right">Saldo</span>
+                  <span>Mês</span><span className="text-right text-teal-400">Receitas</span><span className="text-right text-rose-300">Despesas</span><span className="text-right">Saldo</span>
                 </div>
                 <div className="divide-y" style={{ borderColor: currentTheme.colors.primary + "10" }}>
                   {monthlyChart.filter(m => m.inc > 0 || m.exp > 0).map((m, i) => {
@@ -434,9 +434,9 @@ export function FinancePage() {
                         onClick={() => { setSelectedMonth(MONTHS_SHORT.indexOf(m.month)); setView("monthly"); }}
                       >
                         <span className="font-medium" style={{ color: currentTheme.colors.text }}>{m.month}</span>
-                        <span className="text-right font-medium text-green-600">{fmtShort(m.inc)}</span>
-                        <span className="text-right font-medium text-red-500">{fmtShort(m.exp)}</span>
-                        <span className="text-right font-bold" style={{ color: bal >= 0 ? "#059669" : "#EF4444" }}>{fmtShort(bal)}</span>
+                        <span className="text-right font-medium text-teal-400">{fmtShort(m.inc)}</span>
+                        <span className="text-right font-medium text-rose-300">{fmtShort(m.exp)}</span>
+                        <span className="text-right font-bold" style={{ color: bal >= 0 ? "#7BC4A8" : "#D49898" }}>{fmtShort(bal)}</span>
                       </div>
                     );
                   })}
@@ -513,8 +513,8 @@ export function FinancePage() {
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-display text-base font-semibold" style={{ color: currentTheme.colors.text }}>{label}</h4>
                   <div className="flex items-center gap-3 text-xs">
-                    {grpInc > 0 && <span className="font-semibold text-green-600">+{fmt(grpInc)}</span>}
-                    {grpExp > 0 && <span className="font-semibold text-red-500">-{fmt(grpExp)}</span>}
+                    {grpInc > 0 && <span className="font-semibold text-teal-400">+{fmt(grpInc)}</span>}
+                    {grpExp > 0 && <span className="font-semibold text-rose-300">-{fmt(grpExp)}</span>}
                   </div>
                 </div>
                 <div className="rounded-2xl overflow-hidden" style={{ background: currentTheme.colors.surface, boxShadow: `0 2px 12px ${currentTheme.colors.primary}08` }}>
@@ -566,7 +566,7 @@ export function FinancePage() {
               <div className="flex gap-2 mb-5">
                 {(["expense","income"] as const).map(t => {
                   const isActive = form.type === t
-                  const color    = t === "income" ? "#10B981" : "#EF4444"
+                  const color    = t === "income" ? "#7BC4A8" : "#D49898"
                   const Icon     = t === "income" ? TrendingUp : TrendingDown
                   return (
                     <button key={t} onClick={() => setForm(f => ({ ...f, type: t, category: t === "income" ? "Salário" : "Supermercado" }))}
@@ -716,7 +716,7 @@ function TxRow({ t, theme, onDelete, onEdit }: { t: Transaction; theme: any; onD
           <span className="text-[10px]" style={{ color: theme.colors.textMuted }}>{new Date(t.date + "T00:00").toLocaleDateString("pt-BR", { day: "numeric", month: "short" })}</span>
         </div>
       </div>
-      <p className="text-sm font-bold flex-shrink-0" style={{ color: t.type === "income" ? "#10B981" : "#EF4444" }}>
+      <p className="text-sm font-bold flex-shrink-0" style={{ color: t.type === "income" ? "#7BC4A8" : "#D49898" }}>
         {t.type === "income" ? "+" : "-"}{t.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
       </p>
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all ml-1">
@@ -727,8 +727,8 @@ function TxRow({ t, theme, onDelete, onEdit }: { t: Transaction; theme: any; onD
         </button>
         <button onClick={() => onDelete(t.id)}
           className="w-7 h-7 flex items-center justify-center rounded-lg transition-all hover:opacity-80"
-          style={{ background: '#EF444420' }}>
-          <Trash2 className="w-3.5 h-3.5" style={{ color: '#EF4444' }} />
+          style={{ background: '#D4989820' }}>
+          <Trash2 className="w-3.5 h-3.5" style={{ color: '#D49898' }} />
         </button>
       </div>
     </div>
