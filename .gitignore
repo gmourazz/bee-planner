@@ -29,6 +29,9 @@ pnpm-debug.log*
 *.swp
 *.swo
 
+# Claude
+.claude/
+
 # TypeScript
 *.tsbuildinfo
 
